@@ -1,0 +1,281 @@
+CptS 355 - Programming LanguageDesign
+
+Programming Assignment: 1 Title: Translation
+
+Issued: Jan16, 2015 Due: Wed, Jan 28, 2015, by 11:59 pm
+
+This assignment will count for approximately 5% of your final grade. 
+
+In this assignment you will explore use of some of the features of Python. 
+
+Turning in your assignment
+
+Note the following directions carefully. Points will be deducted for incorrectly named files and functions. 
+
+All the problem solutions should be placed in a single file named one.py. When you are done and 
+
+certain that everything is working correctly, turn in your file by uploading to the ANGEL system.
+
+Implement your code for Python 3. Be sure to include your name as a comment at the top of the file. 
+
+Also in a comment, indicating whether your code is intended for Unix/Linux or Windows -- programs' 
+
+behavior may differ slightly between the two systems; your code only has to work on one or the other.
+
+The work you turn in is to be your own personal work. You may not copy another student's code or work 
+
+together on writing code. You may not copy code from the web, or anything else that lets you avoid 
+
+solving the problems for yourself. 
+
+Grading
+
+The assignment will be marked for good programming style (appropriate algorithms, good indentation 
+
+and appropriate comments -- refer to the Python style guide) -- as well as clean and correct execution. 
+
+• Good python style favors for loops rather than while loops (when possible). 
+
+• Also, code to do the same thing (or something easily parameterizable) at different points in a 
+
+program should not be duplicated but extracted into a callable function. 
+
+• Turning in "final" code that produces debugging output is bad form, and points will be deducted. 
+
+Here's a trick. Near the top of your program write a debug function that can be turned on and 
+
+off by changing a single variable. 
+
+debugging = True
+
+def debug(*s): if debugging: print(*s)
+
+Where you want to produce debugging output use debug("This is my debugging 
+
+output") instead of print. (How it works: Using * in front of the parameter of a function means 
+
+that a variable number of arguments can be passed to that parameter. Then using *s as 
+
+print's argument passes along those arguments to print.) 
+
+Warmup -- makettable() and trans() -- 30%
+
+The text of a message can be hidden by applying a translation function to each character. 
+
+Define a function makettable(s1,s2) that returns a dictionary such that each character in s1 is 
+
+mapped to the character at the corresponding position in s2. You may assume that the characters in 
+
+s1 are unique and that the two strings are the same length. (When I say "you may assume X" it means 
+
+that your code does not have to check whether X holds or not). So for example, 
+
+makettable('abcdefg', 'gfedcba') returns {'a': 'g', 'c': 'e', 'b': 'f', 'e': 
+
+'c', 'd': 'd', 'g': 'a', 'f': 'b'} Important note: throughout the class, when I say a 
+
+function returns a value, I do not mean that it prints the value. Please pay attention to the difference.
+
+Now, define a function trans(ttable, s). trans translates its string argument, s, according to its 
+
+translation table argument, ttable. Argument ttable is, of course, a dictionary returned by the 
+
+makettable function, and the result of trans is obtained by replacing each character, c, of s by 
+
+ttable[c], if c is amongst the keys of the ttable. If however c is not in ttable.keys() then it is 
+
+unchanged in the output. This is all harder to describe than to do! To easily look up k in dictionary, D,
+
+specifying that the same character is to be used if it is not present as a key in the dictionary you can use 
+
+translation = D.get(k,k) # use help({}.get) to see more about get
+
+The above trick with get is important to learn and use when appropriate. Points will be taken off for not 
+
+using it when appropriate!
+
+Define a function testtrans() that minimally does the following (more testing code would be 
+
+good.): 
+
+# function to test translation code
+
+# return True if successful, False if any test fails
+
+def testtrans():
+
+ ttable = makettable('abc', 'xyz')
+
+ revttable = makettable('xyz', 'abc')
+
+ tests = "Now I know my abc's"
+
+ answer = "Now I know my xyz's"
+
+ if trans(ttable, tests) != answer: return False
+
+if trans(revttable, trans(ttable, tests)) != "Now I know mb abc's": return 
+
+False
+
+ if trans(ttable,'') != '': return False
+
+ if trans(makettable('',''), "abc") != 'abc': return False
+
+ return True
+
+histo() - 30%
+
+Define a function, histo(s) computing the histogram of a given string. (Look up histogram in the 
+
+dictionary if you don't know what it means.) The histogram returned by the function is a list of 
+
+characters in the input string s each paired with its frequency. Characters must appear in the list ordered 
+
+from most frequent to least frequent. For example, histo('implemented') is [('e',3), 
+
+('m',2), ('d',1),('i',1), ('l',1), ('n',1), ('p',1), ('t',1)]. (Characters 
+
+with the same frequency must appear in increasing alphabetical order.) To implement the sorting you 
+
+must use the python built-in function sorted. Do not write your own sorting code. (Hint:
+
+help(sorted) and the Python documentation are your friends.) 
+
+Define a function testhisto() that tests your histo function, returning True if the code passes 
+
+your tests, and False if the tests fail. Hint: By now you should be familiar with using dictionaries and 
+
+should be able to write a function that builds the histogram in a single pass over the input string.
+
+digraphs() - 30%
+
+A digraph is a pair of characters that occur adjacent to one another in a text. By convention we write 
+
+each digraph between a pair of '/' characters to make it easier to see where the blanks are. For 
+
+example the digraphs at the beginning of the first sentence of this section are /A /, / d/, /di/, 
+
+/ig/, etc. Digraph frequency counts are helpful in cryptological analysis of some ciphers.
+
+Define a digraphs(s) function that returns a list containing the number of times each digraph occurs 
+
+in string s. Digraphs must be listed in alphabetical order. Again, use the built-in function sorted and do 
+
+not write your own sorting code. Digraphs that do not occur in the input (0 occurrences) should not be 
+
+listed in the output. 
+
+Here is what the function might return on some hypothetical sample input: 
+
+[('/ </', 48), ('/ a/', 56), ('/ d/', 30), ('/ i/', 34), ('/ o/', 37), 
+
+('/ t/', 66), ('/. /', 31), ('/an/', 33), ('/co/', 47), ('/d /',38), 
+
+('/de/', 44), ('/e /', 83), ('/he/', 41), ('/in/', 53), ('/n /',40), 
+
+('/or/', 36), ('/r /', 32), ('/re/', 44), ('/s /', 44), ('/t /',36), 
+
+('/th/', 52), ('/to/', 42)
+
+Define a test function, testdigraphs() to test your digraphs code.
+
+Main program - 10%
+
+So far we've just defined a bunch of functions in our one.py program. To actually execute the code, we 
+
+need to write the code for the "main" program. Unlike in C or Java, this is not done by writing a function 
+
+with a special name. Instead the following idiom is used. This code is to be written at the left margin of 
+
+your input file (or at the same level as the def lines if you've indented those. 
+
+if __name__ == '__main__':
+
+ ...code to do whatever you want done...
+
+For this assignment, we want to run all the tests, so your main should look like:
+
+if __name__ == '__main__':
+
+ passedMsg = "%s passed"
+
+ failedMsg = "%s failed"
+
+ if testttrans():
+
+ print ( passedMsg % 'testtrans' )
+
+ else:
+
+ print ( failedMsg % 'testtrans' )
+
+ # etc. for the other tests.
+
+ # notice how you are repeating a lot of code here
+
+ # think about how you could avoid that -- we will discuss in class
+
+Note that having your code pass your tests is not proof of the code's correctness -- but it is evidence. 
+
+You can't prove a program is correct by testing, though you can prove it is incorrect! 
+
+Cryptogram - 5% extra credit
+
+Use your trans, histo, and digraph functions in an interactive python session to try to figure out 
+
+the following cryptogram. To make the functions available in the interactive session 
+
+>>> from one import *
+
+>>>
+
+If you haven't solved one of these before you may want to look on the web for hints on the relative 
+
+frequencies of letters and digraphs in the English language. You can use your functions to try out 
+
+different possibilities and get clues about the translation being used. (Digits and punctuation are not 
+
+changed in this cryptogram.) 
+
+ZYX WVWUTSZRVQ VP OUNMXLX WKZYVQL WNXLXQZTK XLZSOTRLYXJ RQ
+
+ZYX WSNI RL ZYX NXLUTZ VP SHHRJXQZST SQJ/VN RQZXQZRVQST NXTXSLXL OK
+
+WXZ VGQXNL. ZYXLX RQZNVJUHZRVQL HSQ YSFX JXFSLZSZRQE HVQLXDUXQHXL ZV
+
+VUN XHVLKLZXM. OUNMXLX WKZYVQL YSFX OXXQ PVUQJ ZV PXXJ VQ S GRJX
+
+FSNRXZK VP MSMMSTL SQJ ORNJL RQ ZYX XFXNETSJXL-XFXQ ZYX VHHSLRVQST
+
+STTRESZVN! OK WNXKRQE VQ QSZRFX GRTJTRPX, SQJ HVMWXZRQE GRZY VZYXN
+
+QSZRFX WNXJSZVNL, WKZYVQL SNX LXNRVULTK RMWSHZRQE ZYX QSZUNST VNJXN
+
+VP LVUZY PTVNRJS'L XHVTVERHST HVMMUQRZRXL. ZYX HVQZRQUXJ
+
+WNVTRPXNSZRVQ VP OUNMXLX WKZYVQL-SQJ ZYX HVQZRQUXJ RQZNVJUHZRVQ VP
+
+QXG PVNXREQ LWXHRXL-HSQ PUNZYXN ZYNXSZXQ MSQK VP ZYX XQJSQEXNXJ
+
+WTSQZL SQJ SQRMSTL GX'NX GVNIRQE JRTREXQZTK
+
+ZV WNVZXHZ. (GGG.QWL.EVF/XFXN/QSZUNXLHRXQHX/OUNMXLXWKZYVQLRQZNV.YZM)
+
+Hint: use your makettable function to gradually build better and better translations between the 
+
+uppercase cryptogram characters to lowercase plaintext characters to make it visually apparent which 
+
+characters have been translated. Note numbers and punctuation in the cryptogram will appear 
+
+unchanged in the answer. 
+
+Put your answer at the end of your one.py file in the form of an assignment of a triple-quoted string to 
+
+the variable thisIsTheCryptogramAnswer. 
+
+thisIsTheCryptogramAnswer = """
+
+write your answer here
+
+"""

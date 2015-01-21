@@ -1,0 +1,74 @@
+====================================================================================================
+Monday - Jan 12
+====================================================================================================
+Introduction
+
+Name pronounced: "Velco Malbasa"
+
+TAs: Parastoo Alinia & Yuchao Ma (ychao.ma@email.wsu.edu)
+
+Imparetive:  C, C++, Java, ...
+Interactive: ML, Matlab, Python, ...
+Functional:  SCHEME, LISP, ML, ...
+Logical:     ProLog, ...
+
+====================================================================================================
+Wednesday - Jan 14
+====================================================================================================
+Programming Languages provide:
+                                Abstractions
+                                Organization principles
+                                Control structures
+
+                      support:
+                                Design
+                                Implementation
+                                Maintenance
+
+Trade-offs:
+            Close to executing machine
+            Convenient for human programmer
+
+Programming languages, like natural languages, offers different vocabulary and thus the ability to express different things better.
+
+Ada:     Department of Defense
+Fortran: Computation
+Cobol:   Business
+C:       Operating systems/embedded systems
+Java:    Virtual machines (various platforms)
+
+Abstraction used to conquer the complexity (procedural abstraction, hard to reuse)
+
+Procedures and data clearly seperated - works as long as the data is not too complex
+
+New: object oriented - both data and procedural abstraction (data and procedures encapsulated into object)
+
+C++ first widely used OO programming language
+Problem: requirement to be backwords compatible with C
+
+====================================================================================================
+Friday - Jan 16
+====================================================================================================
+TA: Dana 118 Friday 1-2pm, Th 3-4pm
+
+Cost: Memory, execution time, time/effort to write/maintain code, learning it, compilation time/size
+
+Python:
+
+    No type declaration (dynamic type)
+    No semi colons ending lines
+    comment with #
+
+    done = False (done is a pointer/reference to booleon object)
+
+    whitespace used to define scope rather than { }
+    forces easy to visualize scope
+
+    while i < 5:
+        i += 1
+
+    uses / for long lines, to continue on next line
+
+    33 reserved words (case sensitive)
+    identifier cannot begin with number
+    
