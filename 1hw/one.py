@@ -20,7 +20,9 @@ def debug(*s):
 
 def test(i, o, expected):
     """Runs tests on a function given a list of inputs and expected outputs"""
-    if (o != expected):
+    if (o == expected):
+        return True
+    else:
         print('=' * 78)
         print(i)
         print('-' * 78)
@@ -29,6 +31,7 @@ def test(i, o, expected):
         print('.' * 78)
         print("Expected:")
         print(expected)
+        return False
 
 
 # The text of a message can be hidden by applying a translation function to each character. Define a function makettable(s1,s2) that returns a dictionary such that each character in s1 is mapped to the character at the corresponding position in s2. You may assume that the characters in s1 are unique and that the two strings are the same length. (When I say "you may assume X" it means that your code does not have to check whether X holds or not).
@@ -81,8 +84,11 @@ def testtrans():
     inputs.append([makettable('',''), "abc"])
     outputs.append('abc')
 
+    result = True
     for i,o in zip(inputs,outputs):
-        test("trans(" + str(i).strip('[]') + ")", trans(i[0], i[1]), o)
+        if(test("trans(" + str(i).strip('[]') + ")", trans(i[0], i[1]), o) == False):
+            result = False
+    return result
 
 
 # Define a function, histo(s) computing the histogram of a given string. (Look up histogram in the dictionary if you don't know what it means.) The histogram returned by the function is a list of characters in the input string s each paired with its frequency. Characters must appear in the list ordered from most frequent to least frequent. For example, histo('implemented') is [('e',3), ('m',2), ('d',1), ('i',1), ('l',1), ('n',1), ('p',1), ('t',1)]. (Characters with the same frequency must appear in increasing alphabetical order.) To implement the sorting you must use the python built-in function sorted.
@@ -120,8 +126,11 @@ def testhisto():
     inputs.append('aaabbccd')
     outputs.append([('a',3), ('b',2), ('c',2), ('d',1)])
 
+    result = True
     for i,o in zip(inputs,outputs):
-        test('histo(' + '"'+i+'"' + ')', str(histo(i)), str(o))
+        if(test('histo(' + '"'+i+'"' + ')', str(histo(i)), str(o)) == False):
+            result = False
+    return result
 
 
 # A digraph is a pair of characters that occur adjacent to one another in a text. By convention we write each digraph between a pair of '/' characters to make it easier to see where the blanks are. For example the digraphs at the beginning of the first sentence of this section are /A /, / d/, /di/, /ig/, etc. Digraph frequency counts are helpful in cryptological analysis of some ciphers. Define a digraphs(s) function that returns a list containing the number of times each digraph occurs in string s. Digraphs must be listed in alphabetical order. Again, use the built-in function sorted and do not write your own sorting code. Digraphs that do not occur in the input (0 occurrences) should not be listed in the output.
@@ -138,13 +147,11 @@ def digraphs(s):
     """Returns a digraph depicting the frequency of adjacent char in string s"""
     debug('digraphs: ' + '"'+s+'"')
     D = {}
-    for i in range(len(s)-2):
+    for i in range(len(s)-1):
         pair = '/' + s[i:i+2] + '/'
         D[pair] = D.get(pair, 0) + 1
     # sorted by key then by value
-    # check that sort is alphabetical, then be frequency
     digraph = sorted(D.items(), key=lambda t : (t[0], -t[1]))
-    #digraph = sorted(D.items(), key=operator.itemgetter(0,1))
     debug(digraph)
     return digraph
 
@@ -156,21 +163,32 @@ def testdigraphs():
     inputs = []
     outputs = []
 
-#
-# [('/ </', 48), ('/ a/', 56), ('/ d/', 30), ('/ i/', 34), ('/ o/', 37),
-# ('/ t/', 66), ('/. /', 31), ('/an/', 33), ('/co/', 47), ('/d /',38),
-# ('/de/', 44), ('/e /', 83), ('/he/', 41), ('/in/', 53), ('/n /',40),
-# ('/or/', 36), ('/r /', 32), ('/re/', 44), ('/s /', 44), ('/t /',36),
-# ('/th/', 52), ('/to/', 42)
-    inputs.append("The quick brown fox")
-    outputs.append([('/Th/', 1), ('/he/', 1), ('/e /', 1), ('/ q/', 1),
-                  ('/qu/', 1), ('/ui/', 1), ('/ic/', 1), ('/ck/', 1),
-                  ('/k /', 1), ('/ b/', 1), ('/br/', 1), ('/ro/', 1),
-                  ('/ow/', 1), ('/wn/', 1), ('/n /', 1), ('/ f/', 1),
-                  ('/fo/', 1), ('/ox/', 1)])
+# [('/ </', 48), ('/ a/', 56), ('/ d/', 30), ('/ i/', 34), ('/ o/',37),
+#  ('/ t/', 66), ('/. /', 31), ('/an/', 33), ('/co/', 47), ('/d /',38),
+#  ('/de/', 44), ('/e /', 83), ('/he/', 41), ('/in/', 53), ('/n /',40),
+#  ('/or/', 36), ('/r /', 32), ('/re/', 44), ('/s /', 44), ('/t /',36),
+#  ('/th/', 52), ('/to/', 42)
+
+    inputs.append('abbccddddab')
+    outputs.append([('/ab/', 2), ('/bb/', 1), ('/bc/', 1), ('/cc/', 1),
+                    ('/cd/', 1), ('/da/', 1), ('/dd/', 3)])
+
+    inputs.append('aaabbccd')
+    outputs.append([('/aa/', 2), ('/ab/', 1), ('/bb/', 1), ('/bc/', 1),
+                    ('/cc/', 1), ('/cd/', 1)])
+
+    inputs.append('dccbbaaa')
+    outputs.append([('/aa/', 2), ('/ba/', 1), ('/bb/', 1), ('/cb/', 1),
+                    ('/cc/', 1), ('/dc/', 1)])
 
     for i,o in zip(inputs,outputs):
         test('digraphs(' + '"'+i+'"' + ')', str(digraphs(i)), str(o))
+
+    result = True
+    for i,o in zip(inputs,outputs):
+        if(test('digraphs(' + '"'+i+'"' + ')', str(digraphs(i)), str(o)) == False):
+            result = False
+    return result
 
 
 #===================================== Main ====================================
@@ -181,14 +199,11 @@ if __name__ == '__main__':
         failedMsg = "%s failed"
 
         print()
-        testtrans()
-        testhisto()
-        testdigraphs()
+        if(testtrans()):    print("Translation...OK")
+        if(testhisto()):    print("Histogram.....OK")
+        if(testdigraphs()): print("Digraphs......OK")
         print()
 
-# etc. for the other tests.
-# notice how you are repeating a lot of code here
-# think about how you could avoid that -- we will discuss in class
 
 #===============================================================================
 
