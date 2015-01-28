@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# Python 3.2.3
 # Linux/Unix
 
 # James Jessen
@@ -34,18 +33,23 @@ def test(function, outputs, *inputs):
         if(actual != o):
             result = False
             # Create visual seperation between failures
-            debug('=' * _PRINT_WIDTH)
-            debug(function.__name__ + "(" +  str(i).strip('[]()') + ")")
-            debug('-' * _PRINT_WIDTH)
-            debug("Actual:")
-            debug(actual)
-            debug('.' * _PRINT_WIDTH)
-            debug("Expected:")
-            debug(o)
+            print('=' * _PRINT_WIDTH)
+            # Display the function and its input
+            print(function.__name__ + "(" +  str(i).strip('[]()') + ")")
+            # Make actual and expected outputs easy to compare
+            print('-' * _PRINT_WIDTH)
+            print("Actual:")
+            print(actual)
+            print('.' * _PRINT_WIDTH)
+            print("Expected:")
+            print(o)
 
-    # Create visual seperation between tested functions, if there is need
     if(result == False):
-        debug(('#' * _PRINT_WIDTH) + '\n')
+        # Create visual seperation between tested functions, if there is need
+        print(('#' * _PRINT_WIDTH) + '\n')
+    else:
+        # So there is some indication if everything works
+        print(function.__name__ + ": OK")
 
     return result
 
@@ -68,7 +72,7 @@ def makettable(s1, s2):
 # The translation table is a dictionary.
 # If a character is not in the translation table, it remains unchanged.
 def trans(ttable, s):
-    """Translate string s using translation table ttable"""
+    """Return Translation of string s using translation table ttable"""
     translation = ""
 
     for c in s:
@@ -111,8 +115,8 @@ def histo(s):
     for c in s:
         D[c] = D.get(c, 0) + 1
 
-    # Primarly sort by frequency (High->Low)
-    # Secondarly sort alphabetically (A->Z)
+    # Primary sort by frequency (High->Low)
+    # Secondary sort alphabetically (A->Z)
     histogram = sorted(D.items(), key=lambda t: (-t[1], t[0]))
 
     return histogram
@@ -125,7 +129,7 @@ def testhisto():
 
     inputs.append(('implemented',))
     outputs.append([('e', 3), ('m', 2), ('d', 1), ('i', 1), ('l', 1), ('n', 1),
-                  ('p', 1), ('t', 1)])
+                    ('p', 1), ('t', 1)])
 
     inputs.append(('abbccddd',))
     outputs.append([('d', 3), ('b', 2), ('c', 2), ('a', 1)])
@@ -142,13 +146,13 @@ def digraphs(s):
     """Return digraphs depicting the frequency of adjacent characters in s"""
     D = {}
 
-    for i in range(len(s)-1):
-        pair = '/' + s[i:i+2] + '/'
+    for i in range(len(s) - 1):
+        pair = '/' + s[i : i + 2] + '/'
         D[pair] = D.get(pair, 0) + 1
 
-    # Primarly sort alphabetically (A->Z)
-    # Secondarlyy sort by Frequency (High->Low)
-    digraph = sorted(D.items(), key=lambda t : (t[0], -t[1]))
+    # Primary sort alphabetically (A->Z)
+    # Secondary sort by frequency (High->Low)
+    digraph = sorted(D.items(), key=lambda t: (t[0], -t[1]))
 
     return digraph
 
@@ -177,22 +181,11 @@ def testdigraphs():
 
 if __name__ == '__main__':
 
-    # Saying a function failed testing is not helpful.
-    # Failures are printed in detail upon discovery.
-
-    # Conflicted on whether or not to include this if-statement.
-    # It is used for debugging, but this program does nothing else!
-    #if(debugging):
-
-        print()
-        # A function is considered OK if it passed every test.
-        if(testtrans()):
-            print("Translation...OK")
-        if(testhisto()):
-            print("Histogram.....OK")
-        if(testdigraphs()):
-            print("Digraphs......OK")
-        print()
+    print()
+    testtrans()
+    testhisto()
+    testdigraphs()
+    print()
 
 
 #================================ Extra Credit =================================
@@ -209,6 +202,10 @@ if __name__ == '__main__':
 # QXG PVNXREQ LWXHRXL-HSQ PUNZYXN ZYNXSZXQ MSQK VP ZYX XQJSQEXNXJ
 # WTSQZL SQJ SQRMSTL GX'NX GVNIRQE JRTREXQZTK
 # ZV WNVZXHZ. (GGG.QWL.EVF/XFXN/QSZUNXLHRXQHX/OUNMXLXWKZYVQLRQZNV.YZM)
+
+# SOHJXPEYR*ITMQVWDNLZUFG*K*
+# --------------------------
+# abcdefghijklmnopqrstuvwxyz
 
 thisIsTheCryptogramAnswer = """
 the population of burmese pythons presently established in
