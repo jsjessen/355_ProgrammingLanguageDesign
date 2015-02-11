@@ -6,13 +6,12 @@
 # 10918967
 # CptS 355
 
-#============================= Dict Operators =================================
+import stack
 
-class Dict:
+class DictStack(stack.PostScriptStack):
     """Describe stack class"""
     def __init__(self):
          self.items = {}
-
 
     # Call this function when you encounter "stack"
     def print(self):

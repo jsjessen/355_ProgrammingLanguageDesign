@@ -13,9 +13,9 @@ import re # regular exressions
 
 import debug
 
-from stack import Stack
+from ps_stack import Stack
+from ps_dict import DictStack
 import my_dict
-import operators
 
 global theStack # operand dictionary, implemented as a list
 global sdict # dictionary stack, implemented as a list of dictionaries
