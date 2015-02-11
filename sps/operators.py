@@ -1,4 +1,13 @@
+#!/usr/bin/env python3
+# Python 3.2.3
+# Linux/Unix
 
+# James Jessen
+# 10918967
+# CptS 355
+
+import debug
+import check
 #=========================== Mathematical Operators ============================
 
 # (2 3 add) = (2 + 3) = 5
@@ -14,8 +23,9 @@
 #     |___|     |___|
 def add():
     """Addition"""
-    if len() >= 2: # stack has at least 2 items
-        push(isNum(pop()) + isNum(pop()))
+    if stack.size() >= 2: # stack has at least 2 items
+        debug.show('add()')
+        stack.push(check.isNum(stack.pop()) + check.isNum(stack.pop()))
     return None
 
 # (8 5 sub) = (8 - 5) = 3
@@ -31,7 +41,7 @@ def add():
 #     |___|     |___|
 def sub():
     """Subtraction"""
-    if len() >= 2: # stack has at least 2 items
+    if stack.size() >= 2: # stack has at least 2 items
         exch()
         push(isNum(pop()) - isNum(pop()))
     return None
@@ -49,7 +59,7 @@ def sub():
 #     |___|     |___|
 def mul():
     """Multiplication"""
-    if len() >= 2: # stack has at least 2 items
+    if stack.size() >= 2: # stack has at least 2 items
         push(isNum(pop()) * isNum(pop()))
     return None
 
@@ -66,7 +76,7 @@ def mul():
 #     |___|     |___|
 def div():
     """ Divide the second number on the stack by the top number on the stack """
-    if len() >= 2: # stack has at least 2 items
+    if stack.size() >= 2: # stack has at least 2 items
         exch()
         push(isNum(pop()) / isNum(pop()))
     return None
@@ -84,7 +94,7 @@ def div():
 #     |_____|     |___|
 def idiv():
     """Divide the second number on the stack by the top number on the stack"""
-    if len() >= 2: # stack has at least 2 items
+    if stack.size() >= 2: # stack has at least 2 items
         exch()
         push(isNum(pop()) // isNum(pop()))
     return None
@@ -100,7 +110,7 @@ def idiv():
 #     |___|     |____|
 def neg():
     """Negate the top number on the stack"""
-    if len() >= 1:
+    if stack.size() >= 1:
         push(-isNum(pop()))
 
 
@@ -108,7 +118,7 @@ def neg():
 
 def eq():
     """Equal to"""
-    if len() >= 2:
+    if stack.size() >= 2:
         if isNum(pop()) == isNum(pop()):
             push('true')
         else:
@@ -117,7 +127,7 @@ def eq():
 
 def lt():
     """Less than"""
-    if len() >= 2:
+    if stack.size() >= 2:
         if isNum(pop()) > isNum(pop()): # (2 4 lt) = (2 < 4) = (4 > 2)
             push('true')
         else:
@@ -126,7 +136,7 @@ def lt():
 
 def gt():
     """Greater than"""
-    if len() >= 2:
+    if stack.size() >= 2:
         if isNum(pop()) < isNum(pop()): # (4 2 gt) = (4 > 2) = (2 < 4)
             push('true')
         else:
@@ -138,7 +148,7 @@ def gt():
 
 def and_():
     """ ? """
-    if len() >= 2:
+    if stack.size() >= 2:
         if isBool(pop()) and isBool(pop()):
             push('true')
         else:
@@ -147,7 +157,7 @@ def and_():
 
 def or_():
     """ ? """
-    if len() >= 2:
+    if stack.size() >= 2:
         if isBool(pop()) or isBool(pop()):
             push('true')
         else:
@@ -156,28 +166,9 @@ def or_():
 
 def not_():
     """ ? """
-    if len() >= 2:
+    if stack.size() >= 2:
         if not isBool(pop()):
             push('true')
         else:
             push('false')
     return None
-
-
-#============================ Sequencing Operators =============================
-
-def if_():
-    """ ? """
-    ifcode = isCode(pop()) # Make sure it is code (a list)
-    if chBool(pop()):
-        evaluate(ifcode)
-    return None
-
-# NOT IMPLEMENTED !!!
-def if_else():
-    """ ? """
-    ifcode = isCode(pop()) # Make sure it is code (a list)
-    if chBool(pop()):
-        evalLoop(ifcode)
-    return None
-

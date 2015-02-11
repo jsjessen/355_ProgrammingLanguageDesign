@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 
-def debug(*s):
+import inspect
+
+global debugging
+debugging = True
+
+def err(msg):
+    print("Error: {}: {}".format(inspect.stack()[1][3], msg))
+
+def show(*s):
     """Print but only when debugging"""
     if debugging:
         print(*s)

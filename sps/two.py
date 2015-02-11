@@ -11,57 +11,39 @@
 import sys
 import re # regular exressions
 
-global stack # operand dictionary, implemented as a list
+import debug
+
+from stack import Stack
+import my_dict
+import operators
+
+global theStack # operand dictionary, implemented as a list
 global sdict # dictionary stack, implemented as a list of dictionaries
 
-#_PRINT_WIDTH = 80
-#
-#debugging = True  # view debugging output
-#debugging = False  # hide debugging output
+# Constants
+_PRINT_WIDTH = 80
 
+#============================ Sequencing Operators =============================
 
-#================================= Checks ======================================
+def if_():
+    """ ? """
+    ifcode = isCode(pop()) # Make sure it is code (a list)
+    if chBool(pop()):
+        evaluate(ifcode)
+    return None
 
-def isNum(item):
-    """Check if the item is a number"""
-    if isinstance(item, float):
-        return item
-    else:
-        err("Variable not a float.")
-
-def isDict(item):
-    """Check if the item is a dictionary"""
-    if isinstance(item, dict):
-        return item
-    else:
-        err("Variable not a dictionary.")
-
-def isString(item):
-    """Check if the item is a string"""
-    if isinstance(item, str):
-        return item
-    else:
-        err("Variable not a string.")
-
-def isCode(item):
-    """Check if the item is code"""
-    if isinstance(item, list):
-        return item
-    else:
-        err("Variable not code.")
-
-def isBool(item):
-    """Check if the item is a boolean"""
-    if isinstance(item, bool):
-        return item
-    else:
-        err("Variable not a boolean.")
-
+# NOT IMPLEMENTED !!!
+def if_else():
+    """ ? """
+    ifcode = isCode(pop()) # Make sure it is code (a list)
+    if chBool(pop()):
+        evalLoop(ifcode)
+    return None
 
 #=====================================||========================================
 
 def initialize():
-    stack = Stack()
+    theStack = Stack()
     sdict = Stack()
     sdict.push({})
     return None
@@ -71,92 +53,106 @@ def tokenize(fileName, pattern):
     f = open(fileName, 'r')
     text = f.read()
     f.close()
-    parsed = re.findall(pattern, text)
-
-    #for s in parsed:
-
-    #parsed = list of strings
-    #loop through parsed, converting each string into a Token
+    return re.findall(pattern, text)
 
     return None
 
 def evaluate(tokens):
-    p = 0  # control the loop by index p
-    while p < len(tokens):
-        t = tokens[p]
-        p += 1
+    parenlev = 0
+    tok_list = []
+    pushList = False
+    for t in tokens:
+
+        debug.show("-------------------")
+        debug.show("token: {}".format(t))
+
+        if pushList:
+            theStack.push(tok_list)
+            pushList = False
+            tok_list[:] = []
+        elif parenlev > 0:
+            tok_list.append(t)
+            continue
+        elif parenlev < 0:
+            sys.exit("Error: more '}' than '{'")
 
         # handle number, push to the stack
         try:
-            stack.push(float(t))
+            theStack.push(float(t))
             continue
-        except:
+        except ValueError:
             pass
-
-        # handle operator, execute operator
-        try:
-            getattr(operators, t)()
-            continue
-        except:
-            pass
-
-        # handle {
-        if(t == '{'):
-            # push everything between { and } to the stack
-            continue
 
         # handle stack operations pop, clear, stack
-        try:
-            result = getattr(stack, t)()
+        if hasattr(theStack, t):
+            debug.show('Stack Operator')
+            getattr(theStack, t)()
             continue
-        except:
-            pass
 
-        # *** REPACE ALL BELOW WITH THIS??? ***
-        try:
-            result = getattr(moduleName, t + '_')()
+        # handle operator, execute operator
+        if hasattr(operators, t):
+            debug.show('Operator')
+            getattr(operators, t)()
             continue
-        except:
-            pass
-        #****************************************
 
+        if t == '=':
+            theStack.peek()
+            continue
 
         # handle def
-        if(t == 'def'):
             # push name and array to the dict stack
+        # handle dict
+            # define empty dict
+            # begin: push dict to the dictionary stack
+            # end: pop dict from the dictionary stack
+        if hasattr(my_dict, t + '_'):
+            debug.show('Dictionary Operator')
+            getattr(my_dict, t + '_')()
             continue
 
         # handle if
-        if(t == 'if'):
             # recursively call “evalLoop” to execute the code array
+        if(t == 'if'):
+            if_()
             continue
 
         # handle ifelse
-        if(t == 'ifelse'):
             # recursively call “evalLoop” to execute the code array
+        if(t == 'ifelse'):
+            ifelse_()
             continue
 
-        # handle dict
-        if(t == 'dict'):
-            # define empty dict
+        if(t == '{'):
+            parenlev += 1
             continue
 
-        if(t == 'begin'):
-            # begin: push dict to the dictionary stack
+        if(t == '}'):
+            parenlev -= 1
+            if(parenlev == 0):
+                pushList = True
             continue
 
-        if(t == 'end'):
-            # end: pop dict from the dictionary stack
-            continue
+        sys.exit("Error: Do not recognize '{}'".format(t))
+
+    if parenlev > 0:
+        sys.exit("Error: more '{' than '}'")
 
     return None
 
 
 if __name__ == '__main__':
 
-    initialize()
+    #initialize()
+    tokens = ''
 
     pattern = '/?[a-zA-Z][a-zA-Z0-9_]*|[-]?[0-9]+|[}{]|%.*|[^\t\n ]'
-    tokens = tokenize(sys.argv[1], pattern)
 
-    evaluate(tokens)
+    for arg in sys.argv[1:]:
+        try:
+            tokens = tokenize(arg, pattern)
+        except IOError:
+            sys.exit('Error: Bad input file')
+
+        evaluate(tokens)
+
+        print('=' * _PRINT_WIDTH)
