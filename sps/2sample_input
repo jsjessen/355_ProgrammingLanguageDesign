@@ -1,4 +1,4 @@
-3 stack 5 stack add stack
+3 disp 5 stack add stack
 =
 stack
 

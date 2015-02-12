@@ -6,6 +6,8 @@
 # 10918967
 # CptS 355
 
+#-------------------------------------------------------------------------------
+
 import debug
 
 class PostScriptStack:
@@ -24,7 +26,7 @@ class PostScriptStack:
 
     def pop(self):
         """Pop the first item off the stack and return it"""
-        if not self.items:           # If the stack is empty
+        if self.isEmpty():
             debug.err("stack is empty")
             return None
         else:                   # The stack has at least one item
@@ -45,9 +47,16 @@ class PostScriptStack:
     def dup(self):
         """Duplicate the top item of the stack"""
         debug.show('stack.dup()')
-        self.items.push(stack[-1])
+        self.items.push(self.peek())
         return None
 
+    # 9 4 exch:
+    #
+    #         |---|                         |---|
+    #   first | 4 |                         | 9 | second
+    #         |---|               |---|     |---|
+    #  second | 9 |               | 4 |     | 4 | first
+    #         |---| ==> |---| ==> |---| ==> |---|
     def exch(self):
         """Exchange the top two stack values"""
         debug.show('stack.exch()')
@@ -56,19 +65,22 @@ class PostScriptStack:
         push(second)
         return None
 
-    def stack(self):
-        """showlay the contents of the stack, without modifying it"""
+    def disp(self):
+        """show the contents of the stack, without modifying it"""
         for item in reversed(self.items):
             print(item)
         print('=======================')
         return None
+    stack = disp
+    # def stack(self):
+    #     self.disp()
+    #     return None
 
     # Call this function when you encounter '='
     def peek(self):
-        debug.show('stack.peek()')
         """Pop the top item off of the stack and print it"""
-        print(self.items.pop())
-        return None
+        debug.show('stack.peek()')
+        return self.items[-1]
 
     #=========================== Mathematical Operators ============================
 
@@ -81,8 +93,6 @@ class PostScriptStack:
     #     |---|     |---|
     #     | 2 |     | 5 |
     #     |---| ==> |---|
-    #     |...|     |...|
-    #     |___|     |___|
     def add():
         """Addition"""
         if self.size() >= 2: # stack has at least 2 items
@@ -99,8 +109,6 @@ class PostScriptStack:
     #     |---|     |---|
     #     | 8 |     | 3 |
     #     |---| ==> |---|
-    #     |...|     |...|
-    #     |___|     |___|
     def sub():
         """Subtraction"""
         if self.size() >= 2: # stack has at least 2 items
@@ -117,8 +125,6 @@ class PostScriptStack:
     #     |---|     |---|
     #     | 2 |     | 6 |
     #     |---| ==> |---|
-    #     |...|     |...|
-    #     |___|     |___|
     def mul():
         """Multiplication"""
         if self.size() >= 2: # stack has at least 2 items
@@ -134,8 +140,6 @@ class PostScriptStack:
     #     |---|     |---|
     #     | 6 |     |1.5|
     #     |---| ==> |---|
-    #     |...|     |...|
-    #     |___|     |___|
     def div():
         """ Divide the second number on the stack by the top number on the stack """
         if self.size() >= 2: # stack has at least 2 items
@@ -152,8 +156,6 @@ class PostScriptStack:
     #     |-----|     |---|
     #     |  6  |     | 1 |
     #     |-----| ==> |---|
-    #     | ... |     |...|
-    #     |_____|     |___|
     def idiv():
         """Divide the second number on the stack by the top number on the stack"""
         if self.size() >= 2: # stack has at least 2 items
@@ -168,8 +170,6 @@ class PostScriptStack:
     #     |---|     |----|
     #     | 2 |     | -2 |
     #     |---| ==> |----|
-    #     |...|     |....|
-    #     |___|     |____|
     def neg():
         """Negate the top number on the stack"""
         if self.size() >= 1:
@@ -204,7 +204,6 @@ class PostScriptStack:
             else:
                 push('false')
         return None
-
 
     #============================== Boolean Operators ==============================
 

@@ -6,12 +6,21 @@
 # 10918967
 # CptS 355
 
-import stack
+#-------------------------------------------------------------------------------
 
-class DictStack(stack.PostScriptStack):
-    """Describe stack class"""
+import debug
+
+class PostScriptDict():
+    """Describe dict class"""
     def __init__(self):
          self.items = {}
+
+    # The  def operator defines a name.  def requires its two operands to be on the stack:
+    #    name (constant) to be defined and
+    #    the value to which it will be bound
+    def def_(self, key, value):
+        self.items[key] = value
+        return None
 
     # Call this function when you encounter "stack"
     def print(self):
@@ -26,22 +35,7 @@ class DictStack(stack.PostScriptStack):
         """ ? """
         return None
 
-    # begin requires one dictionary operand on the operand stack
-    def begin(in_dict):
-        """ ? """
-        return None
 
-    # end has no operands
-    def end():
-        """ ? """
-        return None
-
-    # The  def operator defines a name.  def requires its two operands to be on the stack:
-    #    name (constant) to be defined and
-    #    the value to which it will be bound
-    def def_(name, value):
-        """ ? """
-        return None
 
     #• SPS dictionaries; modularizing the dictionaries means implementing functions that operate on dictionary to determine whether it contains an entry for a particular name, to retrieve the value associated with a particular name, and to enter a new (name, value) pair.
 

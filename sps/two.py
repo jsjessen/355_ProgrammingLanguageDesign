@@ -13,39 +13,95 @@ import re # regular exressions
 
 import debug
 
-from ps_stack import Stack
-from ps_dict import DictStack
-import my_dict
+import ps_stack
+import ps_dict
+Stack = ps_stack.PostScriptStack
+Dict = ps_dict.PostScriptDict
 
-global theStack # operand dictionary, implemented as a list
-global sdict # dictionary stack, implemented as a list of dictionaries
+global stack # operand dictionary, implemented as a list
+global dictStack # dictionary stack, implemented as a list of dictionaries
 
 # Constants
 _PRINT_WIDTH = 80
 
 #============================ Sequencing Operators =============================
 
+#   condition (if condition: code)
+#   {code}
+# if
+#
+#     |-----------|
+#     |    if     |
+#     |-----------|
+#     |   code    |
+#     |-----------|
+#     | condition |
+#     |-----------|
+#
+# requires 2 objects on stack
+#   a boolean value
+#   one executable array
 def if_():
-    """ ? """
-    ifcode = isCode(pop()) # Make sure it is code (a list)
-    if chBool(pop()):
-        evaluate(ifcode)
+    """Execute code array if the condition is true"""
+    if stack.size() >= 2:
+        ifcode = isCode(stack.pop()) # Make sure it is code (a list)
+        if chBool(stack.pop()):
+            evaluate(ifcode)
+    else:
+        debug.err("not enough items on the stack")
     return None
 
-# NOT IMPLEMENTED !!!
-def if_else():
-    """ ? """
-    ifcode = isCode(pop()) # Make sure it is code (a list)
-    if chBool(pop()):
-        evalLoop(ifcode)
+#   condition   (if condition: trueCode; else: falseCode)
+#   {trueCode}
+#   {falseCode}
+# ifelse
+#
+#     |-----------|
+#     |  ifelse   |
+#     |-----------|
+#     | falseCode |
+#     |-----------|
+#     | trueCode  |
+#     |-----------|
+#     | condition |
+#     |-----------|
+#
+# requires 3 objects on stack
+#   a boolean value
+#   two executable arrays
+def ifelse_():
+    """Execute first code array if the condition is true and the second if it is false"""
+    if stack.size() >= 3:
+        trueCode = isCode(stack.pop()) # Make sure it is code (a list)
+        falseCode = isCode(stack.pop()) # Make sure it is code (a list)
+        if chBool(stack.pop()):
+            evaluate(trueCode)
+        else:
+            evaluate(falseCode)
+    else:
+        debug.err("not enough items on the stack")
     return None
 
 #=====================================||========================================
 
+    # begin requires one dictionary operand on the operand stack
+    def begin(in_dict):
+        """Create a new dictionary on the top of the dictionary stack"""
+        dictStack.push(Dict())
+        return None
+
+    # end has no operands
+    def end():
+        """Remove the a dictionary from the top of the dictionary stack"""
+        dictStack.pop()
+        return None
+
+#=====================================||========================================
+
 def initialize():
-    theStack = Stack()
-    sdict = Stack()
-    sdict.push({})
+    stack = Stack()
+    dictStack = Stack()
+    dictStack.push(Dict())
     return None
 
 def tokenize(fileName, pattern):
@@ -58,101 +114,121 @@ def tokenize(fileName, pattern):
     return None
 
 def evaluate(tokens):
+    #initialize()
+    stack = Stack()
+    dictStack = Stack()
+    dictStack.push(Dict())
+
     parenlev = 0
-    tok_list = []
-    pushList = False
+    codeBlock = []
     for t in tokens:
 
         debug.show("-------------------")
         debug.show("token: {}".format(t))
 
-        if pushList:
-            theStack.push(tok_list)
-            pushList = False
-            tok_list[:] = []
-        elif parenlev > 0:
-            tok_list.append(t)
+        # handle {
+        if t == '{':
+            parenlev += 1
             continue
-        elif parenlev < 0:
-            sys.exit("Error: more '}' than '{'")
+
+        # handle }
+        if t == '}':
+            parenlev -= 1
+            if(parenlev == 0):
+                stack.push(codeBlock)
+                codeBlock = []
+            elif(parenlev < 0):
+                sys.exit("Error: too many '}' or not enough '{'")
+            continue
+
+        # if in {}, add to code block list
+        # Important: After handling of '}'
+        if parenlev > 0:
+            codeBlock.append(t)
+            continue
 
         # handle number, push to the stack
         try:
-            theStack.push(float(t))
+            stack.push(float(t))
             continue
         except ValueError:
             pass
 
-        # handle stack operations pop, clear, stack
-        if hasattr(theStack, t):
-            debug.show('Stack Operator')
-            getattr(theStack, t)()
-            continue
-
-        # handle operator, execute operator
-        if hasattr(operators, t):
-            debug.show('Operator')
-            getattr(operators, t)()
-            continue
-
         if t == '=':
-            theStack.peek()
-            continue
-
-        # handle def
-            # push name and array to the dict stack
-        # handle dict
-            # define empty dict
-            # begin: push dict to the dictionary stack
-            # end: pop dict from the dictionary stack
-        if hasattr(my_dict, t + '_'):
-            debug.show('Dictionary Operator')
-            getattr(my_dict, t + '_')()
+            stack.peek()
             continue
 
         # handle if
-            # recursively call “evalLoop” to execute the code array
-        if(t == 'if'):
+        if t == 'if':
             if_()
             continue
 
         # handle ifelse
-            # recursively call “evalLoop” to execute the code array
-        if(t == 'ifelse'):
+        if t == 'ifelse':
             ifelse_()
             continue
 
-        if(t == '{'):
-            parenlev += 1
+        if t == 'def':
+            stack.exch()
+            dictStack.add(stack.pop(), stack.pop())
+
+        if t == 'begin':
+            begin()
             continue
 
-        if(t == '}'):
-            parenlev -= 1
-            if(parenlev == 0):
-                pushList = True
+        if t == 'end':
+            end()
             continue
+
+        # handle string literals
+        if t[0] == '/':
+            stack.push(t)
+            continue
+
+        # handle stack operations pop, clear, stack
+        # handle operator, execute operator
+        if hasattr(ps_stack, t):
+            debug.show('Stack Operator')
+            getattr(ps_stack, t)()
+            continue
+        elif hasattr(ps_stack, t + '_'):
+            debug.show('Stack Operator')
+            getattr(ps_stack, t + '_')()
+            continue
+
+        # handle def
+        # handle dict
+        if hasattr(ps_dict, t):
+            debug.show('Dictionary Operator')
+            getattr(ps_dict, t)()
+            continue
+        elif hasattr(ps_dict, t + '_'):
+            debug.show('Dictionary Operator')
+            getattr(ps_dict, t + '_')()
+            continue
+
+        # search for tok in dictStack, starting with top dict and moving downward
+        # if found, use key to get value, push value onto stack
 
         sys.exit("Error: Do not recognize '{}'".format(t))
 
     if parenlev > 0:
-        sys.exit("Error: more '{' than '}'")
+        sys.exit("Error: too many '{' or not enough '}'")
 
     return None
 
 
 if __name__ == '__main__':
 
-    #initialize()
-    tokens = ''
-
     pattern = '/?[a-zA-Z][a-zA-Z0-9_]*|[-]?[0-9]+|[}{]|%.*|[^\t\n ]'
 
+    tokens = ''
     for arg in sys.argv[1:]:
         try:
             tokens = tokenize(arg, pattern)
         except IOError:
             sys.exit('Error: Bad input file')
+            continue
 
         evaluate(tokens)
-
         print('=' * _PRINT_WIDTH)
