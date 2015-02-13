@@ -11,59 +11,97 @@
 import sys
 import re # regular exressions
 
+import debug
+
+import ps_stack
+import ps_dict
+
 global stack # operand dictionary, implemented as a list
-global sdict # dictionary stack, implemented as a list of dictionaries
+global dicts # dictionary stack, implemented as a list of dictionaries
 
-#_PRINT_WIDTH = 80
+# Constants
+_PRINT_WIDTH = 80
+
+#============================ Sequencing Operators =============================
+
+#   condition (if condition: code)
+#   {code}
+# if
 #
-#debugging = True  # view debugging output
-#debugging = False  # hide debugging output
-
-
-#================================= Checks ======================================
-
-def isNum(item):
-    """Check if the item is a number"""
-    if isinstance(item, float):
-        return item
+#     |-----------|
+#     |    if     |
+#     |-----------|
+#     |   code    |
+#     |-----------|
+#     | condition |
+#     |-----------|
+#
+# requires 2 objects on stack
+#   a boolean value
+#   one executable array
+def if_():
+    """Execute code array if the condition is true"""
+    if stack.size() >= 2:
+        ifcode = isCode(stack.pop()) # Make sure it is code (a list)
+        if chBool(stack.pop()):
+            evaluate(ifcode)
     else:
-        err("Variable not a float.")
+        debug.err("not enough items on the stack")
+    return None
 
-def isDict(item):
-    """Check if the item is a dictionary"""
-    if isinstance(item, dict):
-        return item
+#   condition   (if condition: trueCode; else: falseCode)
+#   {trueCode}
+#   {falseCode}
+# ifelse
+#
+#     |-----------|
+#     |  ifelse   |
+#     |-----------|
+#     | falseCode |
+#     |-----------|
+#     | trueCode  |
+#     |-----------|
+#     | condition |
+#     |-----------|
+#
+# requires 3 objects on stack
+#   a boolean value
+#   two executable arrays
+def ifelse_():
+    """Execute first code array if the condition is true and the second if it is false"""
+    if stack.size() >= 3:
+        trueCode = isCode(stack.pop()) # Make sure it is code (a list)
+        falseCode = isCode(stack.pop()) # Make sure it is code (a list)
+        if chBool(stack.pop()):
+            evaluate(trueCode)
+        else:
+            evaluate(falseCode)
     else:
-        err("Variable not a dictionary.")
+        debug.err("not enough items on the stack")
+    return None
 
-def isString(item):
-    """Check if the item is a string"""
-    if isinstance(item, str):
-        return item
-    else:
-        err("Variable not a string.")
+#=====================================||========================================
 
-def isCode(item):
-    """Check if the item is code"""
-    if isinstance(item, list):
-        return item
-    else:
-        err("Variable not code.")
+    # begin requires one dictionary operand on the operand stack
+    def begin(in_dict):
+        """Create a new dictionary on the top of the dictionary stack"""
+        dicts.push(Dict())
+        return None
 
-def isBool(item):
-    """Check if the item is a boolean"""
-    if isinstance(item, bool):
-        return item
-    else:
-        err("Variable not a boolean.")
-
+    # end has no operands
+    def end():
+        """Remove the a dictionary from the top of the dictionary stack"""
+        dicts.pop()
+        return None
 
 #=====================================||========================================
 
 def initialize():
-    stack = Stack()
-    sdict = Stack()
-    sdict.push({})
+    global stack
+    global dicts
+    stack = ps_stack.PostScriptStack()
+    dicts = ps_stack.PostScriptStack()
+    dicts.push(ps_dict.PostScriptDict())
     return None
 
 def tokenize(fileName, pattern):
@@ -71,92 +109,123 @@ def tokenize(fileName, pattern):
     f = open(fileName, 'r')
     text = f.read()
     f.close()
-    parsed = re.findall(pattern, text)
-
-    #for s in parsed:
-
-    #parsed = list of strings
-    #loop through parsed, converting each string into a Token
+    return re.findall(pattern, text)
 
     return None
 
 def evaluate(tokens):
-    p = 0  # control the loop by index p
-    while p < len(tokens):
-        t = tokens[p]
-        p += 1
+    parenlev = 0
+    codeBlock = []
+    for t in tokens:
+
+        debug.show("-------------------")
+        debug.show("token: {}".format(t))
+
+        # handle {
+        if t == '{':
+            parenlev += 1
+            continue
+
+        # handle }
+        if t == '}':
+            parenlev -= 1
+            if(parenlev == 0):
+                stack.push(codeBlock)
+                codeBlock = []
+            elif(parenlev < 0):
+                sys.exit("Error: too many '}' or not enough '{'")
+            continue
+
+        # if in {}, add to code block list
+        # Important: After handling of '}'
+        if parenlev > 0:
+            codeBlock.append(t)
+            continue
 
         # handle number, push to the stack
         try:
             stack.push(float(t))
             continue
-        except:
+        except ValueError:
             pass
 
-        # handle operator, execute operator
-        try:
-            getattr(operators, t)()
-            continue
-        except:
-            pass
+        if (t == 'true') or (t == 'false'):
+            stack.push(t)
 
-        # handle {
-        if(t == '{'):
-            # push everything between { and } to the stack
-            continue
-
-        # handle stack operations pop, clear, stack
-        try:
-            result = getattr(stack, t)()
-            continue
-        except:
-            pass
-
-        # *** REPACE ALL BELOW WITH THIS??? ***
-        try:
-            result = getattr(moduleName, t + '_')()
-            continue
-        except:
-            pass
-        #****************************************
-
-
-        # handle def
-        if(t == 'def'):
-            # push name and array to the dict stack
+        if t == '=':
+            print(stack.pop())
             continue
 
         # handle if
-        if(t == 'if'):
-            # recursively call “evalLoop” to execute the code array
+        if t == 'if':
+            if_()
             continue
 
         # handle ifelse
-        if(t == 'ifelse'):
-            # recursively call “evalLoop” to execute the code array
+        if t == 'ifelse':
+            ifelse_()
             continue
 
+        if t == 'def':
+            stack.exch()
+            dicts.add(stack.pop(), stack.pop())
+
+        if t == 'begin':
+            begin()
+            continue
+
+        if t == 'end':
+            end()
+            continue
+
+        # handle string literals
+        if t[0] == '/':
+            stack.push(t)
+            continue
+
+        # handle stack operations pop, clear, stack
+        # handle operator, execute operator
+        if hasattr(stack, t):
+            debug.show('Stack Operator')
+            getattr(stack, t)()
+            continue
+        elif hasattr(stack, t + '_'):
+            debug.show('Stack Operator')
+            getattr(stack, t + '_')()
+            continue
+
+        # handle def
         # handle dict
-        if(t == 'dict'):
-            # define empty dict
+        if hasattr(dicts, t):
+            debug.show('Dictionary Operator')
+            getattr(dicts, t)()
+            continue
+        elif hasattr(dicts, t + '_'):
+            debug.show('Dictionary Operator')
+            getattr(dicts, t + '_')()
             continue
 
-        if(t == 'begin'):
-            # begin: push dict to the dictionary stack
-            continue
+        # search for tok in dicts, starting with top dict and moving downward
+        # if found, use key to get value, push value onto stack
 
-        if(t == 'end'):
-            # end: pop dict from the dictionary stack
-            continue
+        sys.exit("Error: Do not recognize '{}'".format(t))
+
+    if parenlev > 0:
+        sys.exit("Error: too many '{' or not enough '}'")
 
     return None
 
 
 if __name__ == '__main__':
-
     initialize()
 
+    tokens = ''
     pattern = '/?[a-zA-Z][a-zA-Z0-9_]*|[-]?[0-9]+|[}{]|%.*|[^\t\n ]'
-    tokens = tokenize(sys.argv[1], pattern)
+    for arg in sys.argv[1:]:
+        try:
+            tokens = tokenize(arg, pattern)
+        except IOError:
+            sys.exit('Error: Bad input file')
 
-    evaluate(tokens)
+        evaluate(tokens)
+        print('=' * _PRINT_WIDTH)

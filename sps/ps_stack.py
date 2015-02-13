@@ -9,6 +9,7 @@
 #-------------------------------------------------------------------------------
 
 import debug
+import check
 
 class PostScriptStack:
     """Describe stack class"""
@@ -47,7 +48,7 @@ class PostScriptStack:
     def dup(self):
         """Duplicate the top item of the stack"""
         debug.show('stack.dup()')
-        self.items.push(self.peek())
+        self.push(self.peek())
         return None
 
     # 9 4 exch:
@@ -60,9 +61,9 @@ class PostScriptStack:
     def exch(self):
         """Exchange the top two stack values"""
         debug.show('stack.exch()')
-        first, second = pop(), pop()
-        push(first)
-        push(second)
+        first, second = self.pop(), self.pop()
+        self.push(first)
+        self.push(second)
         return None
 
     def disp(self):
@@ -93,10 +94,10 @@ class PostScriptStack:
     #     |---|     |---|
     #     | 2 |     | 5 |
     #     |---| ==> |---|
-    def add():
+    def add(self):
         """Addition"""
+        debug.show('add()')
         if self.size() >= 2: # stack has at least 2 items
-            debug.show('add()')
             self.push(check.isNum(self.pop()) + check.isNum(self.pop()))
         return None
 
@@ -109,11 +110,11 @@ class PostScriptStack:
     #     |---|     |---|
     #     | 8 |     | 3 |
     #     |---| ==> |---|
-    def sub():
+    def sub(self):
         """Subtraction"""
         if self.size() >= 2: # stack has at least 2 items
-            exch()
-            push(isNum(pop()) - isNum(pop()))
+            second, first = self.pop(), self.pop()
+            self.push(check.isNum(first) - check.isNum(second))
         return None
 
     # (2 3 mul) = (2 * 3) = 6
@@ -125,10 +126,10 @@ class PostScriptStack:
     #     |---|     |---|
     #     | 2 |     | 6 |
     #     |---| ==> |---|
-    def mul():
+    def mul(self):
         """Multiplication"""
         if self.size() >= 2: # stack has at least 2 items
-            push(isNum(pop()) * isNum(pop()))
+            self.push(check.isNum(self.pop()) * check.isNum(self.pop()))
         return None
 
     # (6 4 div) = (6 / 4) = 1.5
@@ -140,11 +141,11 @@ class PostScriptStack:
     #     |---|     |---|
     #     | 6 |     |1.5|
     #     |---| ==> |---|
-    def div():
+    def div(self):
         """ Divide the second number on the stack by the top number on the stack """
         if self.size() >= 2: # stack has at least 2 items
-            exch()
-            push(isNum(pop()) / isNum(pop()))
+            second, first = self.pop(), self.pop()
+            self.push(check.isNum(first) / check.isNum(second))
         return None
 
     # (6 4 idiv) = (6 / 4) = 1
@@ -156,11 +157,11 @@ class PostScriptStack:
     #     |-----|     |---|
     #     |  6  |     | 1 |
     #     |-----| ==> |---|
-    def idiv():
+    def idiv(self):
         """Divide the second number on the stack by the top number on the stack"""
         if self.size() >= 2: # stack has at least 2 items
-            exch()
-            push(isNum(pop()) // isNum(pop()))
+            second, first = self.pop(), self.pop()
+            self.push(check.isNum(first) // check.isNum(second))
         return None
 
     # (2 neg) = (-2) = -2
@@ -170,66 +171,66 @@ class PostScriptStack:
     #     |---|     |----|
     #     | 2 |     | -2 |
     #     |---| ==> |----|
-    def neg():
+    def neg(self):
         """Negate the top number on the stack"""
         if self.size() >= 1:
-            push(-isNum(pop()))
+            self.push(-check.isNum(self.pop()))
 
 
     #============================ Comparison Operators =============================
 
-    def eq():
+    def eq(self):
         """Equal to"""
         if self.size() >= 2:
-            if isNum(pop()) == isNum(pop()):
-                push('true')
+            if check.isNum(self.pop()) == check.isNum(self.pop()):
+                self.push('true')
             else:
-                push('false')
+                self.push('false')
         return None
 
-    def lt():
+    def lt(self):
         """Less than"""
         if self.size() >= 2:
-            if isNum(pop()) > isNum(pop()): # (2 4 lt) = (2 < 4) = (4 > 2)
-                push('true')
+            if check.isNum(self.pop()) > check.isNum(self.pop()): # (2 4 lt) = (2 < 4) = (4 > 2)
+                self.push('true')
             else:
-                push('false')
+                self.push('false')
         return None
 
-    def gt():
+    def gt(self):
         """Greater than"""
         if self.size() >= 2:
-            if isNum(pop()) < isNum(pop()): # (4 2 gt) = (4 > 2) = (2 < 4)
-                push('true')
+            if check.isNum(self.pop()) < check.isNum(self.pop()): # (4 2 gt) = (4 > 2) = (2 < 4)
+                self.push('true')
             else:
-                push('false')
+                self.push('false')
         return None
 
     #============================== Boolean Operators ==============================
 
-    def and_():
+    def and_(self):
         """ ? """
         if self.size() >= 2:
-            if isBool(pop()) and isBool(pop()):
-                push('true')
+            if check.isBool(self.pop()) and check.isBool(self.pop()):
+                self.push('true')
             else:
-                push('false')
+                self.push('false')
         return None
 
-    def or_():
+    def or_(self):
         """ ? """
         if self.size() >= 2:
-            if isBool(pop()) or isBool(pop()):
-                push('true')
+            if check.isBool(self.pop()) or check.isBool(self.pop()):
+                self.push('true')
             else:
-                push('false')
+                self.push('false')
         return None
 
-    def not_():
+    def not_(self):
         """ ? """
         if self.size() >= 2:
-            if not isBool(pop()):
-                push('true')
+            if not check.isBool(self.pop()):
+                self.push('true')
             else:
-                push('false')
+                self.push('false')
         return None

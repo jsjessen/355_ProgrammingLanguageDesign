@@ -15,11 +15,9 @@ import debug
 
 import ps_stack
 import ps_dict
-Stack = ps_stack.PostScriptStack
-Dict = ps_dict.PostScriptDict
 
 global stack # operand dictionary, implemented as a list
-global dictStack # dictionary stack, implemented as a list of dictionaries
+global dicts # dictionary stack, implemented as a list of dictionaries
 
 # Constants
 _PRINT_WIDTH = 80
@@ -87,21 +85,23 @@ def ifelse_():
     # begin requires one dictionary operand on the operand stack
     def begin(in_dict):
         """Create a new dictionary on the top of the dictionary stack"""
-        dictStack.push(Dict())
+        dicts.push(Dict())
         return None
 
     # end has no operands
     def end():
         """Remove the a dictionary from the top of the dictionary stack"""
-        dictStack.pop()
+        dicts.pop()
         return None
 
 #=====================================||========================================
 
 def initialize():
-    stack = Stack()
-    dictStack = Stack()
-    dictStack.push(Dict())
+    global stack
+    global dicts
+    stack = ps_stack.PostScriptStack()
+    dicts = ps_stack.PostScriptStack()
+    dicts.push(ps_dict.PostScriptDict())
     return None
 
 def tokenize(fileName, pattern):
@@ -114,11 +114,6 @@ def tokenize(fileName, pattern):
     return None
 
 def evaluate(tokens):
-    #initialize()
-    stack = Stack()
-    dictStack = Stack()
-    dictStack.push(Dict())
-
     parenlev = 0
     codeBlock = []
     for t in tokens:
@@ -154,8 +149,11 @@ def evaluate(tokens):
         except ValueError:
             pass
 
+        if (t == 'true') or (t == 'false'):
+            stack.push(t)
+
         if t == '=':
-            stack.peek()
+            print(stack.pop())
             continue
 
         # handle if
@@ -170,7 +168,7 @@ def evaluate(tokens):
 
         if t == 'def':
             stack.exch()
-            dictStack.add(stack.pop(), stack.pop())
+            dicts.add(stack.pop(), stack.pop())
 
         if t == 'begin':
             begin()
@@ -187,27 +185,27 @@ def evaluate(tokens):
 
         # handle stack operations pop, clear, stack
         # handle operator, execute operator
-        if hasattr(ps_stack, t):
+        if hasattr(stack, t):
             debug.show('Stack Operator')
-            getattr(ps_stack, t)()
+            getattr(stack, t)()
             continue
-        elif hasattr(ps_stack, t + '_'):
+        elif hasattr(stack, t + '_'):
             debug.show('Stack Operator')
-            getattr(ps_stack, t + '_')()
+            getattr(stack, t + '_')()
             continue
 
         # handle def
         # handle dict
-        if hasattr(ps_dict, t):
+        if hasattr(dicts, t):
             debug.show('Dictionary Operator')
-            getattr(ps_dict, t)()
+            getattr(dicts, t)()
             continue
-        elif hasattr(ps_dict, t + '_'):
+        elif hasattr(dicts, t + '_'):
             debug.show('Dictionary Operator')
-            getattr(ps_dict, t + '_')()
+            getattr(dicts, t + '_')()
             continue
 
-        # search for tok in dictStack, starting with top dict and moving downward
+        # search for tok in dicts, starting with top dict and moving downward
         # if found, use key to get value, push value onto stack
 
         sys.exit("Error: Do not recognize '{}'".format(t))
@@ -219,16 +217,15 @@ def evaluate(tokens):
 
 
 if __name__ == '__main__':
-
-    pattern = '/?[a-zA-Z][a-zA-Z0-9_]*|[-]?[0-9]+|[}{]|%.*|[^\t\n ]'
+    initialize()
 
     tokens = ''
+    pattern = '/?[a-zA-Z][a-zA-Z0-9_]*|[-]?[0-9]+|[}{]|%.*|[^\t\n ]'
     for arg in sys.argv[1:]:
         try:
             tokens = tokenize(arg, pattern)
         except IOError:
             sys.exit('Error: Bad input file')
-            continue
 
         evaluate(tokens)
         print('=' * _PRINT_WIDTH)
