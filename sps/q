@@ -219,6 +219,9 @@ def evaluate(tokens):
 if __name__ == '__main__':
     initialize()
 
+    ps_stack.test()
+    exit()
+
     tokens = ''
     pattern = '/?[a-zA-Z][a-zA-Z0-9_]*|[-]?[0-9]+|[}{]|%.*|[^\t\n ]'
     for arg in sys.argv[1:]:

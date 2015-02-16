@@ -8,39 +8,44 @@
 
 #================================= Checks ======================================
 
+import debug
+
 def isNum(item):
     """Check if the item is a number"""
-    if isinstance(item, float):
+    if isinstance(item, float) or isinstance(item, int):
         return item
     else:
-        err("Variable not a float.")
+        debug.err("{0} is a {1} not a number.".format(item, type(item).__name__))
+        return False
 
 def isDict(item):
     """Check if the item is a dictionary"""
     if isinstance(item, dict):
         return item
     else:
-        err("Variable not a dictionary.")
+        debug.err("{0} is a {1} not a dictionary.".format(item, type(item).__name__))
+        return False
 
 def isString(item):
     """Check if the item is a string"""
     if isinstance(item, str):
         return item
     else:
-        err("Variable not a string.")
+        debug.err("{0} is a {1} not a string.".format(item, type(item).__name__))
+        return False
 
 def isCode(item):
     """Check if the item is code"""
     if isinstance(item, list):
         return item
     else:
-        err("Variable not code.")
+        debug.err("{0} is a {1} not code.".format(item, type(item).__name__))
+        return False
 
 def isBool(item):
     """Check if the item is a boolean"""
     if isinstance(item, bool):
         return item
     else:
-        err("Variable not a boolean.")
-
-
+        debug.err("{0} is a {1} not a boolean.".format(item, type(item).__name__))
+        return False
