@@ -8,35 +8,64 @@
 
 #-------------------------------------------------------------------------------
 
+import check
+import ps_stack
 import debug
 
-class PostScriptDict():
-    """Describe dict class"""
+class PostScriptDictStack(ps_stack.PostScriptStack):
+    """PostScript Dictionary Stack"""
     def __init__(self):
-         self.items = {}
+        self.items = []
+        self.push({})
 
+    def __str__(self):
+        """Display the contents of the dictionary stack, without modifying it"""
+        myString =  '\n    Dictionary Stack   \n'
+        myString += '***********************\n'
+        for dic in reversed(self.items):
+            for key in dic:
+                myString += key + ': ' + str(dic[key]) + '\n'
+            myString += '=======================\n'
+        return myString
+
+    def lookup(self, key):
+        for dic in reversed(self.items):
+            if key in dic:
+                return dic[key]
+        return None
+
+    #   key value def (key = value)
+    #
+    #     |-------|
+    #     | value |
+    #     |-------|
+    #     |  key  |
+    #     |-------|
+    #
     # The  def operator defines a name.  def requires its two operands to be on the stack:
     #    name (constant) to be defined and
     #    the value to which it will be bound
-    def def_(self, key, value):
-        self.items[key] = value
+    def define(self, key, value):
+        if check.isString(key):
+            self.peek()[key] = value
+        else:
+            debug.err("Cannot use '{}' as key value".format(key))
+        debug.show("Defined: {} = {}".format(key, value))
         return None
 
-    # Call this function when you encounter "stack"
-    def print(self):
-        """Display the contents of the stack, without modifying it"""
-        for item in reversed(self.items):
-            print(item)
-        print('=======================')
+    # begin requires one dictionary operand on the operand stack
+    def begin(self, newDict):
+        """Create a new dictionary on the top of the dictionary stack"""
+        self.push(newDict)
+        return None
+        if check.isDict(newDict):
+            self.push(newDict)
+        else:
+            print(type(newDict).__name__)
+            debug.err("Attempting to add non-dict to dictionary stack")
         return None
 
-#(Normally Postscript uses a dict operator requiring one operand. Our SPS has the dictz operator with zero operands. You can run regular postscript code in your interpreter if you prefix the Postscript code by /dict {pop dictz} def, to provide a sensible definition for the missing dict operation.)
-    def dictz():
-        """ ? """
+    def end(self):
+        """Remove the a dictionary from the top of the dictionary stack"""
+        self.pop()
         return None
-
-
-
-    #• SPS dictionaries; modularizing the dictionaries means implementing functions that operate on dictionary to determine whether it contains an entry for a particular name, to retrieve the value associated with a particular name, and to enter a new (name, value) pair.
-
-    #• the dictionary stack: as with the operand stack, implement functions to push and pop values on the dictionary stack, check whether it is empty, etc.

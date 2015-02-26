@@ -5,8 +5,9 @@
         n 2 lt
         {1}
     {n -1 add fact n mul }
+    stack
     ifelse
     end
 }def
 
-5 fact =
+5 fact 

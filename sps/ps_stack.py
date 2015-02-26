@@ -12,9 +12,21 @@ import debug
 import check
 
 class PostScriptStack:
-    """Describe stack class"""
+    """PostScript Stack"""
     def __init__(self):
-         self.items = []
+        self.items = []
+
+    def __str__(self):
+        myString =  '\n     Operand Stack     \n'
+        myString += '***********************\n'
+        for item in reversed(self.items):
+            myString += str(item) + '\n'
+        myString += '-----------------------\n'
+        return myString
+
+    def stack(self):
+        """Show the contents of the stack, without modifying it"""
+        print(self)
 
     def isEmpty(self):
         return self.size() == 0
@@ -66,16 +78,6 @@ class PostScriptStack:
         self.push(second)
         return None
 
-    def disp(self):
-        """show the contents of the stack, without modifying it"""
-        for item in reversed(self.items):
-            print(item)
-        print('=======================')
-        return None
-    stack = disp
-    # def stack(self):
-    #     self.disp()
-    #     return None
 
     # Call this function when you encounter '='
     def peek(self):
@@ -83,6 +85,11 @@ class PostScriptStack:
         debug.show('stack.peek()')
         return self.items[-1]
 
+    #(Normally Postscript uses a dict operator requiring one operand. Our SPS has the dictz operator with zero operands. You can run regular postscript code in your interpreter if you prefix the Postscript code by /dict {pop dictz} def, to provide a sensible definition for the missing dict operation.)
+    def dictz(self):
+        """Push an empty dictionary on to the operand stack"""
+        self.push({})
+        return None
 
 #=========================== Mathematical Operators ============================
 
@@ -240,88 +247,88 @@ class PostScriptStack:
 
 #================================== Testing ====================================
 
-def test():
-    """Test functionality of the PostScriptStack class"""
-    print("Testing Stack")
-    print("=============")
-    if(test_basic()):
-        print("Basic Stack Operations...OK")
-    if(test_math()):
-        print("Mathematical Operations...OK")
-    if(test_comp()):
-        print("Comparison Operations...OK")
-    if(test_bool()):
-        print("Boolean Operations...OK")
-
-    return None
-
-def test_basic():
-    """Test basic stack functions"""
-    stack = PostScriptStack()
-    inputs = []
-    outputs = []
-
-    # isEmpty(self):
-    # push(self, item):
-    # pop(self):
-    # size(self):
-    # clear(self):
-    # dup(self):
-    # exch(self):
-    # disp(self):
-    # peek(self):
-
-    return debug.test_class(stack, inputs, outputs)
-
-def test_math():
-    """Test mathematical operation functions"""
-    stack = PostScriptStack()
-    inputs = []
-    outputs = []
-
-# add(self):
-
-# sub(self):
-    # 8 - 5 = 3
-    inputs.append((stack.push(8), stack.push(5), stack.sub())
-    outputs.append(1)
-    # 2 - 12 = -10
-    inputs.append((stack.push(2), stack.push(12), stack.sub())
-    outputs.append(1)
-    # -4 - -6 = 2
-    inputs.append((stack.push(-4), stack.push(-6), stack.sub())
-    outputs.append(1)
-
-# mul(self):
-
-# div(self):
-
-# idiv(self):
-
-# neg(self):
-
-    return debug.test_class(stack, inputs, outputs)
-
-def test_comp(stack):
-    """Test comparison operation functions"""
-    stack = PostScriptStack()
-    inputs = []
-    outputs = []
-
-    # eq(self):
-    # lt(self):
-    # gt(self):
-
-    return debug.test_class(stack, inputs, outputs)
-
-def test_bool(stack):
-    """Test boolean operation functions"""
-    stack = PostScriptStack()
-    inputs = []
-    outputs = []
-
-    # and_(self):
-    # or_(self):
-    # not_(self):
-
-    return debug.test_class(stack, inputs, outputs)
+#def test():
+#    """Test functionality of the PostScriptStack class"""
+#    print("Testing Stack")
+#    print("=============")
+#    if(test_basic()):
+#        print("Basic Stack Operations...OK")
+#    if(test_math()):
+#        print("Mathematical Operations...OK")
+#    if(test_comp()):
+#        print("Comparison Operations...OK")
+#    if(test_bool()):
+#        print("Boolean Operations...OK")
+#
+#    return None
+#
+#def test_basic():
+#    """Test basic stack functions"""
+#    stack = PostScriptStack()
+#    inputs = []
+#    outputs = []
+#
+#    # isEmpty(self):
+#    # push(self, item):
+#    # pop(self):
+#    # size(self):
+#    # clear(self):
+#    # dup(self):
+#    # exch(self):
+#    # disp(self):
+#    # peek(self):
+#
+#    return debug.test_class(stack, inputs, outputs)
+#
+#def test_math():
+#    """Test mathematical operation functions"""
+#    stack = PostScriptStack()
+#    inputs = []
+#    outputs = []
+#
+## add(self):
+#
+## sub(self):
+#    # 8 - 5 = 3
+#    inputs.append((stack.push(8), stack.push(5), stack.sub()))
+#    outputs.append(1)
+#    # 2 - 12 = -10
+#    inputs.append((stack.push(2), stack.push(12), stack.sub()))
+#    outputs.append(1)
+#    # -4 - -6 = 2
+#    inputs.append((stack.push(-4), stack.push(-6), stack.sub()))
+#    outputs.append(1)
+#
+## mul(self):
+#
+## div(self):
+#
+## idiv(self):
+#
+## neg(self):
+#
+#    return debug.test_class(stack, inputs, outputs)
+#
+#def test_comp(stack):
+#    """Test comparison operation functions"""
+#    stack = PostScriptStack()
+#    inputs = []
+#    outputs = []
+#
+#    # eq(self):
+#    # lt(self):
+#    # gt(self):
+#
+#    return debug.test_class(stack, inputs, outputs)
+#
+#def test_bool(stack):
+#    """Test boolean operation functions"""
+#    stack = PostScriptStack()
+#    inputs = []
+#    outputs = []
+#
+#    # and_(self):
+#    # or_(self):
+#    # not_(self):
+#
+#    return debug.test_class(stack, inputs, outputs)
