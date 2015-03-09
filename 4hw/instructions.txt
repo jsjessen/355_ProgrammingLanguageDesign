@@ -1,0 +1,103 @@
+Programming Assignment: 3 Title: Scheme
+
+Issued: Feb 23, 2015 Due: Monday, March 9, 2015, by 11:59 pm
+
+Setup
+-----
+This homework provides some practice in Scheme programming. The Racket environment, which can be 
+downloaded from http://racket-lang.org is a friendly Scheme implementation. It can be installed on 
+most operating systems (e.g., Mac, Linux, Unix, Windows). On Windows, get the installer from the 
+racket-lang website. For Linux systems you can probably find a racket package in your distribution's 
+package manager. After installing use the drracket command to start up the IDE. Be sure to select 
+R5RS as the language on the language menu. You should only have to do this once after installing.
+
+Turning in your work
+--------------------
+Turn in the assignment by uploading your file to the ANGEL system. Turn in a text file containing legal 
+Scheme code -- you should be able to take the contents of your file and run it through Racket without 
+errors. Create your own test cases for each function: you may include the test cases in what you turn in.
+
+General rules
+-------------
+Unless directed otherwise, you should implement your functions using recursive definitions that you build up from the basic built-in functions such as CONS, CAR, CDR, LIST, etc. 
+
+Don't use set! and don't define anything except functions. 
+
+
+nth
+
+Define a function that returns the nth element of a list (0-based indexing). Assume that the index, n, is at least 0 and smaller than the length of the list. Example:
+
+> (nth '(1 2 3 4) 1)
+
+2
+
+repl
+
+Define a function repl
+
+(define (repl L i v) ... )
+
+that returns a (new) list which is the same as L except that the ith element is v. Again, assume that the 
+
+index i is at least 0 and smaller than the length of the list. Example:
+
+> (repl '(1 2 3 4) 1 7) 
+
+(1 7 3 4)
+
+range
+
+Define a LISP function range like the range function in Python: 
+
+(define (range min max) ... )
+
+that return a list of integers (min min+1 ... max-1). If min ≥ max return the empty list. Example:
+
+> (range 4 6)
+
+(4 5)
+
+merge2
+
+Define a function merge2 that merges two lists of integers, each already in ascending order, into a new 
+
+list that is also in ascending order. The length of the new list is the sum of the lengths of the original lists. 
+
+(define (merge2 l1 l2) ...)
+
+For example 
+
+> (merge2 '(2 4 6) '(1 4 5))
+
+(1 2 4 4 5 6)
+
+fold
+
+Just use the definition given in class. You'll need it for the function below. 
+
+mergeN
+
+Using merge2 and the fold function defined above you can now define mergeN which takes a list of lists, 
+
+each already in ascending order, and returns a new list containing all of the elements in ascending order. 
+
+For example, 
+
+> (mergeN '())
+
+()
+
+> (mergeN '((2 4 6) (1 4 5)))
+
+(1 2 4 4 5 6)
+
+> (mergeN '((2 4 5) (1 4 6) (3 7 9)))
+
+(1 2 3 4 4 5 6 7 9)
+
+Note that this requires making sure that your understanding of fold encompasses seeing that it can 
+
+return a list, not just a simple value; but the solution is, in fact, a very simple use of fold once you 
+
+choose the right value for the base case corresponding to the empty list as input.

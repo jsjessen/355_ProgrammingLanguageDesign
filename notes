@@ -73,5 +73,209 @@ Python:
     identifier cannot begin with number
     
 ====================================================================================================
-Friday - Jan 23 
+Wednesday - March 4 
 ====================================================================================================
+Quiz on the Wed or Friday before break
+
+ML = Meta Language (and is mathematical!)
+ML can be downloaded from mosml.org
+
+If you pass ML compiling phase (ML does type checking) your program will probably work!
+
+- 3 + 4 ('-' is the line prompt, not minus sign)
+val it = 7 : int (it = ans, just the value of the last expression) (int is type)
+
+type is static because its determined while parsing, not during runtime
+~3 (negative 3, using '~' instead of '-' for unary negation))
+
+binary operators only work on vars of the same type
+2 + 3.4  result: ERROR 
+
+bool (true, false), int (3 8), real (3.14 8.2), unit()
+
+
+let declaration in expression end
+    -----------    ----------
+
+    example:
+        
+            let val pi = 3.1415
+            in pi * pi
+            end
+    
+val <id> = expr
+
+    example:
+            -val seven = 3 + 4;
+            val seven = 7 : int
+
+            -val x = 3;
+            val x = 3 : int
+
+            - val y = x + x;
+            val y = 6 : int
+
+            - val x = 7;
+            val x = 7 : int (x points to 7 now, but its old value 3 is still in memory waiting for garbage collection)
+
+Function Binding
+
+    -val f = fn x => x * 3;  (function fn is value in ML, assigned to f) (an annonymous aka lambda function)
+    val f : int -> int      (a function maps from one type to another, in this case mapping an int to an int)
+
+fn pronounced "lambda" because it is a lambda(aka annonymious) function
+
+    - fun f x = x * 3; (same as above but using a different legal syntax)
+
+[]  = empty list
+nil = the empty list
+[exp1, exp2,..., exp3] = a list of exp1, exp2... (all items in list must be of the same type)
+
+    example:
+            
+            - [1, 2, 3];
+            val it = [1, 2, 3] : int list
+
+            -[true, true, false];
+            val it = [true, true, false] : bool list
+
+
+    - [];  (what is the type of an empty list? `a = something)
+    val `a it = [] : `a list
+
+    - [];
+    val `b it = [] : `b list
+
+    `a is a type variable, an unknown type that could not be deducted form the expression
+
+    - nil;
+    val `c it = [] : `c list
+
+    - ["a", "b", "cde"];
+    val it ["a", "b", "cde"] : string list
+
+    - [fn x => x+1, fn x => x+2]; (a list of functions)
+    val it= [fn, fn] : (int -> int) list
+
+    - [fn x => x+1, fn x => x+2.0]; ERROR (because functions of different type, all list items must be same type)
+
+:: append item to head of an existing list
+
+    example:
+
+            - 1 :: [2,3];
+            val it = [1, 2, 3] : int list
+
+            -1 :: [];
+            val it = [1] : int list
+
+            - 1 :: 2 :: 3;
+            Type clash: expression of type int cannot have type int list
+
+            - 1 :: 2 :: [3];
+            val it = [1, 2, 3] : int list
+
+Tuples: fixed number of ordered items of possibly different types
+
+        - (3, true);
+        val it = (3, true) : int * bool  (first item of type int, second of type bool)
+
+        - (fn x => x+1, fn x => x+2.0);
+        val it = (fn, fn) : (int -> int) * (real -> real)
+
+
+#i, where i >= 1 gets that item number from tuple
+
+        - #2(3, true);
+        val it = true : bool
+
+Record:
+        - {name = "John", phone = 123456};
+        val it = {name = "John", phone = 123456};
+                 {name : string, phone : int}
+
+        - #name(it);
+        val it = "John" : string
+
+
+Type: unit
+    an empty tuple
+
+Data-type declarations
+
+    datatype <type_name> = <constructor_clause>
+
+    datatype Color = Red | Blue | Green;
+    > New type names: =Color
+      datatype Color =
+        con Blue = Blue : Color  (con = constructor)
+        con Green = Green : Color
+        ...
+
+    - datatype Address = Email of string
+                        | Phone of int
+                        | Postal of {street: string,
+                                     city: string,
+                                     zip: int}
+
+====================================================================================================
+Monday - March 9 
+====================================================================================================
+fun f(x,y) = x + y; // the function has 1 parameter (a tuple), not 2
+
+fun len [] = 0
+  | len (x :: xs) = 1 + (len xs);
+val len = fn : `a list -> int           (type = prime a list mapping to int)
+
+[2, 3, 0, 5]
+--- -------
+ x :: xs
+
+ quiz 2 will talk about types (example type: `a)
+
+if the function is an empty list, then it will return in empty list
+but if it is not, 
+
+xs, the rest of the list
+
+fun map f [] = []
+  | map f (x :: xs) = (f x) :: (map f xs); 
+val map = fn ('a -> b') -> 'a list -> 'b list (2 args, so 2 mappings)
+                                               1st arg is a function (f) mapping 'a to 'b
+                                               
+Base case: list is empty
+Apply function to head, cons it will recursive call on the tail (the rest of the list)
+where x is head
+and xs is the rest of the list
+The number of mappings (in the type) = number of list arguments
+
+filter checks a condition and returns a list of the elements that passed the condition (from the original list0
+fold applies a function to each element of a list (can be left or right recurvsive)
+
+What is curried form?
+
+Understand for fold why ('a->'b->'a)->'a->'b list->'a
+z must agree with (f z x) where z is of type 'a
+
+Textbook pg 180 (tail recursive)
+do recursive call AND combine it will something else
+
+One of the quiz questions:
+Is this function tail recursive or not?
+len:No, map:No
+
+with tail recursion, don't need activation record (no recursive roll-back)
+
+What is the ML type of the value (1,"abs",true): int* string* bool*
+What is the ML type of function
+    fun f  x = x * x
+What is result of execution of function
+Curried function
+Constructing a parse tree (easy one)
+Ambiguous grammar s
+Tail recursive functions (is this function tail rec or not?)
+
+10 questions, each 1 line
+
+Types to know:List, records, tuples (tuples and list important)
+
