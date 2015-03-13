@@ -279,3 +279,14 @@ Tail recursive functions (is this function tail rec or not?)
 
 Types to know:List, records, tuples (tuples and list important)
 
+====================================================================================================
+Friday - March 13 
+====================================================================================================
+Look at the lection 22 slides before doing hw5
+there are a lot of good ML function examples
+
+notation in ML is right associative
+so A :: B :: C = 
+   B :: C
+   A :: it
+
