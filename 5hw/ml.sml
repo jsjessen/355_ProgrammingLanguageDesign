@@ -23,14 +23,14 @@ fun in_list (target, []) = false
   if cur = target then true 
   else in_list(target, rest)
 
-val test_in_list = 
+val in_list_TEST = 
   if      in_list (1,[]) = false 
   andalso in_list (1,[1,2,3]) = true
   andalso in_list ([1],[[1]]) = true
   andalso in_list ([1],[[3],[5]]) = false
   andalso in_list ("c",["b","c","z"]) = true
-  then "in_list: PASS"
-  else "in_list: FAIL"
+  then "PASS"
+  else "FAIL"
 
 (*----------------------------------------------------------------*)
 
@@ -45,17 +45,26 @@ val test_in_list =
 *
 * Each value should appear in the output list only once, 
 * but the order does not matter.
+*
+* for each element E in L1
+* add to Result list using ::
+* if (in_list E L2) 
+* andalso not (in_list E Result)
 *)
 
-fun intersection ([], []) = []
-  | fun intersection (current1 :: rest1, current2 :: rest2) = []
+fun intersection ([], L2) = []
+  | intersection (L1, []) = []
+  | intersection (cur1 :: rest1, L2) =
+  if in_list (cur1, L2) 
+  then cur1 :: intersection(rest1, L2)
+  else intersection(rest1, L2)
 
-val test_intersection = 
+val intersection_TEST = 
   if      intersection ([1],[1]) = [1]
   andalso intersection ([1,2,3],[1,2]) = [1,2]
   andalso intersection ([[2,3],[1,2],[2,3]], [[1],[2,3]]) = [[2,3]]
-  then "intersection: PASS"
-  else "intersection: FAIL"
+  then "PASS"
+  else "FAIL"
 
 (*----------------------------------------------------------------*)
 
@@ -73,12 +82,17 @@ val test_intersection =
 * type ''a list -> ''a list -> ''a list.
 *)
 
-val test_union = 
+(*
+fun union [] [] = []
+  | union cur1 :: rest1, cur2 :: rest2 = []
+  
+
+val union_TEST = 
   if      union [1] [1] = [1] 
   andalso union [1,2,3] [1,2] = [1,2,3]
   andalso union [[2,3],[1,2]] [[1],[2,3]] = [[1],[2,3],[1,2]]
-  then "union: PASS"
-  else "union: FAIL"
+  then "PASS"
+  else "FAIL"
 
 (*----------------------------------------------------------------*)
 
@@ -105,11 +119,11 @@ val test_union =
 * reverse is also implemented as a tail-recursive function.
 *)
 
-val test_filter = 
+val filter_TEST = 
   if      filter (fn (x) => (x = 1)) [1,2,3] = [1]
   andalso filter (fn (x) => (x <= 3))[1,2,3,4] = [1,2,3]
-  then "filter: PASS"
-  else "filter: FAIL"
+  then "PASS"
+  else "FAIL"
 
 (*----------------------------------------------------------------*)
 
@@ -132,15 +146,15 @@ val test_filter =
 * between 1 and N elements and all the rest contain N elements.
 *)
 
-val test_groupNl = 
+val groupNl_TEST = 
   if groupNl 2 [1, 2, 3, 4, 5] = [[1], [2, 3], [4, 5]]
-  then "groupNl: PASS"
-  else "groupNl: FAIL"
+  then "PASS"
+  else "FAIL"
 
-val test_groupNr = 
+val groupNr_TEST = 
   if groupNr 2 [1, 2, 3, 4, 5] = [[1, 2], [3, 4], [5]]
-  then "groupNr: PASS"
-  else "groupNr: FAIL"
+  then "PASS"
+  else "FAIL"
 
 (*----------------------------------------------------------------*)
 
@@ -160,12 +174,12 @@ val test_groupNr =
 * sorted result (as in the Scheme assignment).
 *)
 
-val test_mergesort = 
+val test_mergesort_TEST = 
   if      mergesort (fn (x,y) => (x <= y)) [1] = [1]       
   andalso mergesort (fn (x,y) => (x <= y)) [3,2,1,2] = [1,2,2,3]
   andalso mergesort (fn (x,y) => (x >= y)) [3,2,1,2] = [3,2,2,1]
-  then "mergesort: PASS"
-  else "mergesort: FAIL"
+  then "PASS"
+  else "FAIL"
 
 (*----------------------------------------------------------------*)
 
@@ -264,4 +278,5 @@ permutations of l. The permutations may be in any order.
 
 - perms [1, 2, 3]
 [[1, 2, 3], [1, 3, 2], [2, 1, 3], [2, 3, 1], [3, 1, 2], [3, 2, 1]]
+*)
 *)
