@@ -9,95 +9,109 @@
 
 (*================================================================*)
 
+datatype test_result = Pass | Fail
+
+fun test(input, output) =
+  if input = output
+    then Pass
+    else Fail
+
+(*================================================================*)
+
 (*
-* in_list
+* IN_LIST
 * -------
 * This function should return true if the first argument 
 * is a member of the second argument.
 *
-* type (''a * ''a list) -> bool.
+* type : ''a * ''a list -> bool.
 *)
 
-fun in_list (target, []) = false
-  | in_list (target, cur :: rest) = 
-  if cur = target then true 
-  else in_list(target, rest)
+fun in_list(target, []) = false
+  | in_list(target, cur :: rest) = 
+      if cur = target 
+        then true 
+        else in_list(target, rest)
 
 val in_list_TEST = 
-  if      in_list (1,[]) = false 
-  andalso in_list (1,[1,2,3]) = true
-  andalso in_list ([1],[[1]]) = true
-  andalso in_list ([1],[[3],[5]]) = false
-  andalso in_list ("c",["b","c","z"]) = true
-  then "PASS"
-  else "FAIL"
+  (
+    test(in_list(1,[]),               false),
+    test(in_list(1,[1,2,3]),          true),
+    test(in_list([1],[[1]]),          true),
+    test(in_list([1],[[3],[5]]),      false),
+    test(in_list("c",["b","c","z"]),  true)
+  )
 
 (*----------------------------------------------------------------*)
 
 (*
-* intersection
+* INTERSECTION
 * ------------
 * This function should return the intersection of two lists.
-*
-* type ''a list * ''a list -> ''a list. 
-*
-* Maybe you can make use of in_list?
 *
 * Each value should appear in the output list only once, 
 * but the order does not matter.
 *
-* for each element E in L1
-* add to Result list using ::
-* if (in_list E L2) 
-* andalso not (in_list E Result)
+* type : ''a list * ''a list -> ''a list. 
 *)
 
-fun intersection ([], L2) = []
-  | intersection (L1, []) = []
-  | intersection (cur1 :: rest1, L2) =
-  if in_list (cur1, L2) 
-  then cur1 :: intersection(rest1, L2)
-  else intersection(rest1, L2)
+fun intersection(L1, L2) =
+    let
+      fun help([], [], result) = result 
+        | help(L1, [], result) = result 
+        | help([], L2, result) = result 
+        | help(cur :: rest, L2, result) =
+            if in_list(cur, L2)
+            andalso in_list(cur, result) = false
+              then help(rest, L2, cur :: result)
+              else help(rest, L2, result)
+    in
+      help(L1, L2, [])
+    end
 
 val intersection_TEST = 
-  if      intersection ([1],[1]) = [1]
-  andalso intersection ([1,2,3],[1,2]) = [1,2]
-  andalso intersection ([[2,3],[1,2],[2,3]], [[1],[2,3]]) = [[2,3]]
-  then "PASS"
-  else "FAIL"
+  (
+    test(intersection([1],[1]),                           [1]),
+    test(intersection([1,2,3],[1,2]),                     [2,1]),
+    test(intersection([[2,3],[1,2],[2,3]], [[1],[2,3]]),  [[2,3]])
+  )
 
 (*----------------------------------------------------------------*)
 
 (*
-* union
+* UNION
 * -----
 * This function should return the union of two lists. 
+*
 * Each value should appear in the output list only once
 * but the order does not matter. 
 *
-* In the intersection function above the two lists were supplied as a tuple.
-* That is, it had type (''a list * ''a list) -> ''a list. 
-*
-* Make union a function of two arguments: 
-* type ''a list -> ''a list -> ''a list.
+* type : ''a list -> ''a list -> ''a list.
 *)
 
-(*
-fun union [] [] = []
-  | union cur1 :: rest1, cur2 :: rest2 = []
-  
+fun union L1 L2 =
+    let
+      fun help([], [], result) = result 
+        | help([], L2, result) = help(L2, [], result)
+        | help(cur :: rest, L2, result) =
+            if in_list(cur, result) 
+              then help(rest, L2, result)
+              else help(rest, L2, cur :: result)
+    in
+      help(L1, L2, [])
+    end
 
 val union_TEST = 
-  if      union [1] [1] = [1] 
-  andalso union [1,2,3] [1,2] = [1,2,3]
-  andalso union [[2,3],[1,2]] [[1],[2,3]] = [[1],[2,3],[1,2]]
-  then "PASS"
-  else "FAIL"
+  (
+    test(union [1] [1],                     [1]),
+    test(union [1,2,3] [1,2],               [3,2,1]),
+    test(union [[2,3], [1,2]] [[1],[2,3]],  [[1],[1,2],[2,3]])
+  )
 
 (*----------------------------------------------------------------*)
 
 (*
-* filter and reverse
+* FILTER AND REVERSE
 * ------------------
 * filter takes as its first argument a one-argument function, 
 * called a predicate, which returns true or false, 
@@ -119,16 +133,51 @@ val union_TEST =
 * reverse is also implemented as a tail-recursive function.
 *)
 
+(*
+fun filter f [] = []
+  | filter f (cur :: rest) =
+      if f cur
+        then (cur :: (filter f rest))
+        else (filter f rest)
+*)
+fun filter pred L =
+    let
+      fun help pred [] result = result
+        | help pred (cur :: rest) result = 
+            if pred cur
+              then help pred rest (cur :: result)
+              else help pred rest result
+    in
+      reverse(help pred L [])
+    end
+
 val filter_TEST = 
-  if      filter (fn (x) => (x = 1)) [1,2,3] = [1]
-  andalso filter (fn (x) => (x <= 3))[1,2,3,4] = [1,2,3]
-  then "PASS"
-  else "FAIL"
+  (
+    test(filter(fn (x) => (x = 1))  [1,2,3],    [1]),
+    test(filter(fn (x) => (x <= 3)) [1,2,3,4],  [1,2,3])
+  )
+
+
+fun reverse(L) = 
+    let
+      fun help [] result = result
+        | help (cur :: rest) result = help rest (cur :: result)
+    in
+      help L []
+    end
+
+val reverse_TEST = 
+  (
+    test(reverse [],         []),
+    test(reverse [1],        [1]),
+    test(reverse [1,2,3],    [3,2,1]),
+    test(reverse [1,2,3,4],  [4,3,2,1])
+  )
 
 (*----------------------------------------------------------------*)
 
 (*
-* groupNl and groupNr
+* GROUPNL AND GROUPNR
 * -------------------
 * These functions take two arguments. 
 * The first is an integer and the second is a list. 
@@ -146,21 +195,23 @@ val filter_TEST =
 * between 1 and N elements and all the rest contain N elements.
 *)
 
+fun groupNl N L
+
 val groupNl_TEST = 
-  if groupNl 2 [1, 2, 3, 4, 5] = [[1], [2, 3], [4, 5]]
-  then "PASS"
-  else "FAIL"
+  test(groupNl 2 [1, 2, 3, 4, 5],  [[1], [2, 3], [4, 5]])
+
+
+fun groupNr N L
 
 val groupNr_TEST = 
-  if groupNr 2 [1, 2, 3, 4, 5] = [[1, 2], [3, 4], [5]]
-  then "PASS"
-  else "FAIL"
+  test(groupNr 2 [1, 2, 3, 4, 5],  [[1, 2], [3, 4], [5]])
 
+  (*
 (*----------------------------------------------------------------*)
 
 (*
-* mergesort - 15%
-* ------------------------------------------
+* MERGESORT
+* ---------
 * This function takes two arguments. 
 * The first argument is a function called a comparator 
 * and takes as its argument a pair (two-tuple) and returns a boolean. 
@@ -175,15 +226,15 @@ val groupNr_TEST =
 *)
 
 val test_mergesort_TEST = 
-  if      mergesort (fn (x,y) => (x <= y)) [1] = [1]       
-  andalso mergesort (fn (x,y) => (x <= y)) [3,2,1,2] = [1,2,2,3]
-  andalso mergesort (fn (x,y) => (x >= y)) [3,2,1,2] = [3,2,2,1]
-  then "PASS"
-  else "FAIL"
+if      mergesort (fn (x,y) => (x <= y)) [1] = [1]       
+andalso mergesort (fn (x,y) => (x <= y)) [3,2,1,2] = [1,2,2,3]
+andalso mergesort (fn (x,y) => (x >= y)) [3,2,1,2] = [3,2,2,1]
+then "PASS"
+else "FAIL"
 
 (*----------------------------------------------------------------*)
 
-  (*
+(*
 ------------------------------------------
 Practice with datatypes - 15%
 ------------------------------------------
@@ -198,32 +249,32 @@ other.
 
 Define an ML function of no arguments, eitherTest that:
 
-    • constructs an eitherTree with at least 5 int-containing leaves, at least 5 string-containing
-    leaves, and at least 4 levels;
-    • searches the tree using your eitherSearch function for an int that is present in the tree;
-    • and, searches the tree using your eitherSearch function for a value that is not present in the
-    tree.
+• constructs an eitherTree with at least 5 int-containing leaves, at least 5 string-containing
+leaves, and at least 4 levels;
+• searches the tree using your eitherSearch function for an int that is present in the tree;
+• and, searches the tree using your eitherSearch function for a value that is not present in the
+tree.
 
 (*----------------------------------------------------------------*)
-------------------------------------------
-treeToString - 15%
-------------------------------------------
+
+TREETOSTRING
+------------
 A polymorphic tree type, with data only at the leaves, in SML might be represented using
 
-    datatype 'a Tree = LEAF of 'a | NODE of ('a Tree) list
+datatype 'a Tree = LEAF of 'a | NODE of ('a Tree) list
 
 Write a function treeToString: ('a -> string) -> 'a Tree -> string that returns a
 parenthesized string representing an arbitrary Tree. treeToString is invoked as treeToString f t
 where f is a function that converts data of type 'a to a string and t is an 'a Tree. The
 parenthesization rules implemented by treeToString are as follows:
 
-    • For a LEAF node, the returned value is just f the-data-in-the-leaf.
-    • For a LIST node, concatenate the strings produced by treeToString on the elements of the list
-    and surround the resulting string with parentheses. For this function, you may use built-in functions map and String.concat in addition to the generally allowable functions listed above.
+• For a LEAF node, the returned value is just f the-data-in-the-leaf.
+• For a LIST node, concatenate the strings produced by treeToString on the elements of the list
+and surround the resulting string with parentheses. For this function, you may use built-in functions map and String.concat in addition to the generally allowable functions listed above.
 
 We suggest that you start by solving a simpler non-polymorphic problem using
 
-    datatype Tree = LEAF of string | NODE of Tree list
+datatype Tree = LEAF of string | NODE of Tree list
 
 Since the leaves in this simpler problem are already strings you don't need the function argument but
 you can see the overall structure of the solution. Then make the datatype polymorphic and add the
@@ -256,7 +307,7 @@ treeToString Int.toString iL5 should produce "((32((123)(231)12)))".
 Note that interactive SML systems typically do not print all of the contents of deeply nested data
 structures. So after evaluating the declaration for il5 the response may be something like
 
-    val iL5 = NODE [NODE [LEAF #,LEAF #,NODE #]] : int Tree
+val iL5 = NODE [NODE [LEAF #,LEAF #,NODE #]] : int Tree
 
 depending on what SML system you are using (in this case SMLofNJ).
 Additional information about string manipulation: the ^ infix operator concatenates two strings, thus:
@@ -270,9 +321,9 @@ and String.concat concatenates all of the strings in a list of strings. Thus:
 "abcdefghi"
 
 (*----------------------------------------------------------------*)
-------------------------------------------
-Perms - 5%
-------------------------------------------
+
+PERMS
+-----
 Function perms is given a list, l, and returns a list of lists, each of the sublists being one of the length(l)!
 permutations of l. The permutations may be in any order.
 
