@@ -7,18 +7,6 @@
 * CptS 355 HW5
 *)
 
-(* MIGHT NOT BE NEEDED - CONSIDER REMOVING
-fun length [] = 0
-  | length (cur :: rest) = 1 + length rest 
-
-val length_TEST = 
-  (
-    test(length [],               0),
-    test(length [1],              1),
-    test(length [1, 2],           2),
-    test(length [1, 2, 3, 4, 5],  5)
-  )
-*)
 (*================================================================*)
 
 datatype test_result = Pass | Fail
@@ -83,6 +71,7 @@ fun intersection(L1, L2) =
 
 val intersection_TEST = 
   (
+    test(intersection([],[]),                             []),
     test(intersection([1],[1]),                           [1]),
     test(intersection([1,2,3],[1,2]),                     [2,1]),
     test(intersection([[2,3],[1,2],[2,3]], [[1],[2,3]]),  [[2,3]])
@@ -115,6 +104,7 @@ fun union L1 L2 =
 
 val union_TEST = 
   (
+    test(union [] [],                       []),
     test(union [1] [1],                     [1]),
     test(union [1,2,3] [1,2],               [3,2,1]),
     test(union [[2,3], [1,2]] [[1],[2,3]],  [[1],[1,2],[2,3]])
@@ -271,64 +261,112 @@ val groupNr_TEST =
 * Type : ('a * 'a -> bool) -> 'a list -> 'a list 
 *)
 
-fun mergesort comp L = L
+(*
+fun merge [] [] = [] 
+  | merge L1 [] = L1
+  | merge [] L2 = L2
+  | merge (cur1 :: rest1) (cur2 :: rest2) =
+      if cur1 < cur2
+        then cur1 :: (merge rest1 (cur2 :: rest2))
+        else cur2 :: (merge rest2 (cur1 :: rest1))
+
+val merge_TEST = 
+  (
+    test(merge [] [1,2],         [1,2]),
+    test(merge [1,2] [],         [1,2]),
+    test(merge [1,3,5] [2,4,8],  [1,2,3,4,5,8]), 
+    test(merge [1,3,6] [2,4,5],  [1,2,3,4,5,6])
+  )
+
+fun split []  = ([], [])
+  | split [single] = ([single], [])
+  | split (first :: second :: rest) =
     let
-      fun merge [] [] result = result
-        | merge (cur1 :: rest1) (cur2 :: rest2) result =
-            if comp(cur1, cur2)
-              then cur1 :: result
-              else cur2 :: result
+      val (L1, L2) = split rest 
     in
-      reverse(merge L L) 
+      (first :: L1, second :: L2)
+    end
+
+val split_TEST = 
+  (
+    test(split [],         ([], [])),
+    test(split [1],        ([1], [])),
+    test(split [1,3],      ([1], [3])),
+    test(split [1,3,6],    ([1,6], [3])),
+    test(split [1,3,6,7],  ([1,6], [3,7]))
+  )
+  *)
+
+fun mergesort comp [] = []
+  | mergesort comp [single] = [single]
+  | mergesort comp L = 
+    let
+      fun split []  = ([], [])
+        | split [single] = ([single], [])
+        | split (even :: odd :: rest) =
+          let
+           val (L1, L2) = split rest 
+          in
+            (even :: L1, odd :: L2)
+          end
+
+      val (L1, L2) = split L 
+
+      fun merge [] [] = [] 
+        | merge L1 [] = L1
+        | merge [] L2 = L2
+        | merge (cur1 :: rest1) (cur2 :: rest2) =
+            if comp(cur1, cur2)
+              then cur1 :: (merge rest1 (cur2 :: rest2))
+              else cur2 :: (merge rest2 (cur1 :: rest1))
+    in
+      merge (mergesort comp L1) (mergesort comp L2) 
     end
 
 val mergesort_TEST = 
   (
     test(mergesort (fn (x,y) => (x <= y)) [1],          [1]),
     test(mergesort (fn (x,y) => (x <= y)) [3,2,1,2],    [1,2,2,3]),
-    test(mergesort (fn (x,y) => (x >= y)) [3,2,1,2],    [3,2,2,1])
+    test(mergesort (fn (x,y) => (x >= y)) [3,2,1,2],    [3,2,2,1]),
     test(mergesort (fn (x,y) => (x <= y)) [3,2,1,7,2],  [1,2,2,3,7]),
-    test(mergesort (fn (x,y) => (x >= y)) [3,2,1,7,2],  [3,2,2,1,7])
+    test(mergesort (fn (x,y) => (x >= y)) [3,2,1,7,2],  [7,3,2,2,1])
   )
 
 (*----------------------------------------------------------------*)
 
 (*
-fun filter pred L =
-    let
-      fun help pred [] result = result
-        | help pred (cur :: rest) result = 
-            if pred cur
-              then help pred rest (cur :: result)
-              else help pred rest result
-    in
-      reverse(help pred L [])
-    end
+* PRACTICE WITH DATATYPES
+* -----------------------
+* Define an ML datatype: 
+*   datatype either = ImAString of string | ImAnInt of int
+* 
+* Define an ML datatype named eitherTree 
+* for binary trees containing values of type either,
+* where the data is only at the leaves of the tree.
+* 
+* Define an ML function eitherSearch having 
+* type eitherTree -> int -> bool that returns true
+* if the int is in the tree and false otherwise. 
+*   The trick to getting this to type check is to realize that 
+*   ImAnInt of int values and int values do not have the same type. 
+*   But you can transform either into the other.
+* 
+* Define an ML function of no arguments, eitherTest that:
+*   • constructs an eitherTree with at least 5 int-containing leaves, 
+*     at least 5 string-containing leaves, and at least 4 levels
+*   • searches the tree using your eitherSearch function for an 
+*     int that is present in the tree
+*   • searches the tree using your eitherSearch function for 
+*     a value that is not present in the tree
+*)
 
-
-
-------------------------------------------
-Practice with datatypes - 15%
-------------------------------------------
-Define an ML datatype datatype either = ImAString of string | ImAnInt of int.
-
-Define an ML datatype named eitherTree for binary trees containing values of
-type either where the data is only at the leaves of the tree.
-
-Define an ML function eitherSearch having type eitherTree -> int -> bool that returns true
-if the int is in the tree and false otherwise. The trick to getting this to type check is to realize that ImAnInt of int values and int values do not have the same type. But you can transform either into the
-other.
-
-Define an ML function of no arguments, eitherTest that:
-
-• constructs an eitherTree with at least 5 int-containing leaves, at least 5 string-containing
-leaves, and at least 4 levels;
-• searches the tree using your eitherSearch function for an int that is present in the tree;
-• and, searches the tree using your eitherSearch function for a value that is not present in the
-tree.
+(*
+ datatype either = ImAString of string | ImAnInt of int
+*)
 
 (*----------------------------------------------------------------*)
 
+(*
 TREETOSTRING
 ------------
 A polymorphic tree type, with data only at the leaves, in SML might be represented using
@@ -391,14 +429,41 @@ and String.concat concatenates all of the strings in a list of strings. Thus:
 
 - String.concat ["abc", "def", "ghi"];
 "abcdefghi"
+*)
 
 (*----------------------------------------------------------------*)
 
-PERMS
------
-Function perms is given a list, l, and returns a list of lists, each of the sublists being one of the length(l)!
-permutations of l. The permutations may be in any order.
+(*
+* PERMS
+* -----
+* Function perms is given a list, l, and returns a list of lists, each of the sublists being one of the length(l)!
+* permutations of l. The permutations may be in any order.
+*)
 
-- perms [1, 2, 3]
-[[1, 2, 3], [1, 3, 2], [2, 1, 3], [2, 3, 1], [3, 1, 2], [3, 2, 1]]
+(*
+fun perms L
+
+val perms_TEST = 
+  (
+    test(perms [],       [[]]),
+    test(perms [1],      [[1]]),
+    test(perms [1,2],    [[1,2], [2,1]]),
+    test(perms [1,2,3],  [[1,2,3], [1,3,2], [2,1,3], 
+                          [2,3,1], [3,1,2], [3,2,1]])
+  )
+*)
+
+(* MIGHT NOT BE NEEDED - CONSIDER REMOVING
+
+fun length [] = 0
+  | length (cur :: rest) = 1 + length rest 
+
+val length_TEST = 
+  (
+    test(length [],               0),
+    test(length [1],              1),
+    test(length [1, 2],           2),
+    test(length [1, 2, 3, 4, 5],  5)
+  )
+
 *)
