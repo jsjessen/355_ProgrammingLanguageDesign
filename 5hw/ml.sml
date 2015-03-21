@@ -7,6 +7,18 @@
 * CptS 355 HW5
 *)
 
+(* MIGHT NOT BE NEEDED - CONSIDER REMOVING
+fun length [] = 0
+  | length (cur :: rest) = 1 + length rest 
+
+val length_TEST = 
+  (
+    test(length [],               0),
+    test(length [1],              1),
+    test(length [1, 2],           2),
+    test(length [1, 2, 3, 4, 5],  5)
+  )
+*)
 (*================================================================*)
 
 datatype test_result = Pass | Fail
@@ -24,7 +36,7 @@ fun test(input, output) =
 * This function should return true if the first argument 
 * is a member of the second argument.
 *
-* type : ''a * ''a list -> bool.
+* Type : ''a * ''a list -> bool.
 *)
 
 fun in_list(target, []) = false
@@ -52,7 +64,7 @@ val in_list_TEST =
 * Each value should appear in the output list only once, 
 * but the order does not matter.
 *
-* type : ''a list * ''a list -> ''a list. 
+* Type : ''a list * ''a list -> ''a list. 
 *)
 
 fun intersection(L1, L2) =
@@ -86,7 +98,7 @@ val intersection_TEST =
 * Each value should appear in the output list only once
 * but the order does not matter. 
 *
-* type : ''a list -> ''a list -> ''a list.
+* Type : ''a list -> ''a list -> ''a list
 *)
 
 fun union L1 L2 =
@@ -127,36 +139,12 @@ val union_TEST =
 * The function filter will simply call the 
 * auxiliary function with [] as the initial result. 
 * It is the auxiliary function that will be tail recursive. 
+*
 * It turns out that in using the accumulating parameter technique, 
 * the result is produced in reverse order. 
 * So you also need to define the function reverse that reverses a list. 
 * reverse is also implemented as a tail-recursive function.
 *)
-
-(*
-fun filter f [] = []
-  | filter f (cur :: rest) =
-      if f cur
-        then (cur :: (filter f rest))
-        else (filter f rest)
-*)
-fun filter pred L =
-    let
-      fun help pred [] result = result
-        | help pred (cur :: rest) result = 
-            if pred cur
-              then help pred rest (cur :: result)
-              else help pred rest result
-    in
-      reverse(help pred L [])
-    end
-
-val filter_TEST = 
-  (
-    test(filter(fn (x) => (x = 1))  [1,2,3],    [1]),
-    test(filter(fn (x) => (x <= 3)) [1,2,3,4],  [1,2,3])
-  )
-
 
 fun reverse(L) = 
     let
@@ -174,6 +162,24 @@ val reverse_TEST =
     test(reverse [1,2,3,4],  [4,3,2,1])
   )
 
+
+fun filter pred L =
+    let
+      fun help pred [] result = result
+        | help pred (cur :: rest) result = 
+            if pred cur
+              then help pred rest (cur :: result)
+              else help pred rest result
+    in
+      reverse(help pred L [])
+    end
+
+val filter_TEST = 
+  (
+    test(filter(fn (x) => (x = 1))  [1,2,3],    [1]),
+    test(filter(fn (x) => (x <= 3)) [1,2,3,4],  [1,2,3])
+  )
+
 (*----------------------------------------------------------------*)
 
 (*
@@ -184,57 +190,123 @@ val reverse_TEST =
 * The idea is to produce a result in which the elements of the 
 * original list have been collected into sublists each 
 * containing N elements (where N is the integer argument). 
-* Thus the type of each of these is int -> 'a list -> 'a list list. 
+*
 * The difference between the two functions is how they handle 
 * the left-over elements of the list when the integer doesn't 
 * divide the length of the list evenly. 
+*
 * groupNl treats the initial elements of the list as the extras, 
 * thus the result starts with a list of between 1 and N elements 
 * and all the remaining elements of the result list contain N elements. 
+*
 * groupNr does the opposite: the final group contains 
 * between 1 and N elements and all the rest contain N elements.
+*
+* Type : int -> 'a list -> 'a list list
 *)
 
-fun groupNl N L
+
+fun groupNl N L =
+    let
+      fun transfer i [] (dCur :: dRest) = dCur :: dRest
+        | transfer i (sCur :: sRest) (dCur :: dRest) = 
+            if i > 0
+              then transfer (i - 1) sRest ((sCur :: dCur) :: dRest)
+              else transfer N (sCur :: sRest) ([] :: dCur :: dRest)
+    in
+      if N > 0
+        then transfer N (reverse(L)) [[]]
+        else [[]]
+    end
 
 val groupNl_TEST = 
-  test(groupNl 2 [1, 2, 3, 4, 5],  [[1], [2, 3], [4, 5]])
+  (
+    test(groupNl 2 [1, 2, 3, 4, 5],     [[1], [2, 3], [4, 5]]),
+    test(groupNl 3 [1, 2, 3, 4, 5],     [[1, 2], [3, 4, 5]]),
+    test(groupNl 3 [1, 2, 3, 4, 5, 6],  [[1, 2, 3], [4, 5, 6]])
+  )
 
 
-fun groupNr N L
+fun groupNr N L =
+    let
+      fun transfer i [] (dCur :: dRest) = 
+            reverse(dCur) :: dRest
+        | transfer i (sCur :: sRest) (dCur :: dRest) = 
+            if i > 0
+              then transfer (i - 1) sRest 
+                            ((sCur :: dCur) :: dRest)
+              else transfer N (sCur :: sRest) 
+                            ([] :: reverse(dCur) :: dRest)
+    in
+      if N > 0
+        then reverse(transfer N L [[]])
+        else [[]]
+    end
 
 val groupNr_TEST = 
-  test(groupNr 2 [1, 2, 3, 4, 5],  [[1, 2], [3, 4], [5]])
+  (
+    test(groupNr 2 [1, 2, 3, 4, 5],     [[1, 2], [3, 4], [5]]),
+    test(groupNr 3 [1, 2, 3, 4, 5],     [[1, 2, 3], [4, 5]]),
+    test(groupNr 3 [1, 2, 3, 4, 5, 6],  [[1, 2, 3], [4, 5, 6]])
+  )
 
-  (*
 (*----------------------------------------------------------------*)
 
 (*
 * MERGESORT
 * ---------
-* This function takes two arguments. 
-* The first argument is a function called a comparator 
-* and takes as its argument a pair (two-tuple) and returns a boolean. 
-* The second argument is a list. 
-* The type of the sorting function is ('a * 'a -> bool) -> 'a list -> 'a list. 
+* This function takes two arguments:
+*   1) Comparator Function
+*       Takes as its argument a pair (two-tuple) 
+*       Returns a bool
+*   2) List
+*
 * The function mergesort returns a list consisting of the members of its 
 * second argument, ordered so that the comparator returns true on adjacent members.
 *
 * Recall the general structure of mergesort: split the list in 2 equal pieces.
 * Recursively sort the pieces, then merge the two sorted sublists into a 
 * sorted result (as in the Scheme assignment).
+*
+* Type : ('a * 'a -> bool) -> 'a list -> 'a list 
 *)
 
-val test_mergesort_TEST = 
-if      mergesort (fn (x,y) => (x <= y)) [1] = [1]       
-andalso mergesort (fn (x,y) => (x <= y)) [3,2,1,2] = [1,2,2,3]
-andalso mergesort (fn (x,y) => (x >= y)) [3,2,1,2] = [3,2,2,1]
-then "PASS"
-else "FAIL"
+fun mergesort comp L = L
+    let
+      fun merge [] [] result = result
+        | merge (cur1 :: rest1) (cur2 :: rest2) result =
+            if comp(cur1, cur2)
+              then cur1 :: result
+              else cur2 :: result
+    in
+      reverse(merge L L) 
+    end
+
+val mergesort_TEST = 
+  (
+    test(mergesort (fn (x,y) => (x <= y)) [1],          [1]),
+    test(mergesort (fn (x,y) => (x <= y)) [3,2,1,2],    [1,2,2,3]),
+    test(mergesort (fn (x,y) => (x >= y)) [3,2,1,2],    [3,2,2,1])
+    test(mergesort (fn (x,y) => (x <= y)) [3,2,1,7,2],  [1,2,2,3,7]),
+    test(mergesort (fn (x,y) => (x >= y)) [3,2,1,7,2],  [3,2,2,1,7])
+  )
 
 (*----------------------------------------------------------------*)
 
 (*
+fun filter pred L =
+    let
+      fun help pred [] result = result
+        | help pred (cur :: rest) result = 
+            if pred cur
+              then help pred rest (cur :: result)
+              else help pred rest result
+    in
+      reverse(help pred L [])
+    end
+
+
+
 ------------------------------------------
 Practice with datatypes - 15%
 ------------------------------------------
@@ -329,5 +401,4 @@ permutations of l. The permutations may be in any order.
 
 - perms [1, 2, 3]
 [[1, 2, 3], [1, 3, 2], [2, 1, 3], [2, 3, 1], [3, 1, 2], [3, 2, 1]]
-*)
 *)
