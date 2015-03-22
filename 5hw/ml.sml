@@ -7,20 +7,19 @@
 * CptS 355 HW5
 *)
 
-(*================================================================*)
+(*----------------------------------------------------------------------------*)
 
-datatype test_result = Pass | Fail
+datatype TestResult = Pass | Fail
 
 fun test(input, output) =
   if input = output
     then Pass
     else Fail
 
-(*================================================================*)
-
 (*
-* IN_LIST
-* -------
+================================================================================
+IN_LIST
+--------------------------------------------------------------------------------
 * This function should return true if the first argument 
 * is a member of the second argument.
 *
@@ -42,11 +41,10 @@ val in_list_TEST =
     test(in_list("c",["b","c","z"]),  true)
   )
 
-(*----------------------------------------------------------------*)
-
 (*
-* INTERSECTION
-* ------------
+================================================================================
+INTERSECTION
+--------------------------------------------------------------------------------
 * This function should return the intersection of two lists.
 *
 * Each value should appear in the output list only once, 
@@ -76,11 +74,10 @@ val intersection_TEST =
     test(intersection([[2,3],[1,2],[2,3]], [[1],[2,3]]),  [[2,3]])
   )
 
-(*----------------------------------------------------------------*)
-
 (*
-* UNION
-* -----
+================================================================================
+UNION
+--------------------------------------------------------------------------------
 * This function should return the union of two lists. 
 *
 * Each value should appear in the output list only once
@@ -109,11 +106,10 @@ val union_TEST =
     test(union [[2,3], [1,2]] [[1],[2,3]],  [[1],[1,2],[2,3]])
   )
 
-(*----------------------------------------------------------------*)
-
 (*
+================================================================================
 * FILTER AND REVERSE
-* ------------------
+--------------------------------------------------------------------------------
 * filter takes as its first argument a one-argument function, 
 * called a predicate, which returns true or false, 
 * and as its second argument a list. 
@@ -169,11 +165,10 @@ val filter_TEST =
     test(filter(fn (x) => (x <= 3)) [1,2,3,4],  [1,2,3])
   )
 
-(*----------------------------------------------------------------*)
-
 (*
+================================================================================
 * GROUPNL AND GROUPNR
-* -------------------
+--------------------------------------------------------------------------------
 * These functions take two arguments. 
 * The first is an integer and the second is a list. 
 * The idea is to produce a result in which the elements of the 
@@ -194,10 +189,11 @@ val filter_TEST =
 * Type : int -> 'a list -> 'a list list
 *)
 
-
 fun groupNl N L =
     let
-      fun transfer i [] (dCur :: dRest) = dCur :: dRest
+      fun transfer i [] [] = [[]] 
+        | transfer i (dCur :: dRest) [] = [[]] 
+        | transfer i [] (dCur :: dRest) = dCur :: dRest
         | transfer i (sCur :: sRest) (dCur :: dRest) = 
             if i > 0
               then transfer (i - 1) sRest ((sCur :: dCur) :: dRest)
@@ -218,8 +214,9 @@ val groupNl_TEST =
 
 fun groupNr N L =
     let
-      fun transfer i [] (dCur :: dRest) = 
-            reverse(dCur) :: dRest
+      fun transfer i [] [] = [[]] 
+        | transfer i (dCur :: dRest) [] = [[]] 
+        | transfer i [] (dCur :: dRest) = reverse(dCur) :: dRest
         | transfer i (sCur :: sRest) (dCur :: dRest) = 
             if i > 0
               then transfer (i - 1) sRest 
@@ -239,11 +236,10 @@ val groupNr_TEST =
     test(groupNr 3 [1, 2, 3, 4, 5, 6],  [[1, 2, 3], [4, 5, 6]])
   )
 
-(*----------------------------------------------------------------*)
-
 (*
-* MERGESORT
-* ---------
+================================================================================
+MERGESORT
+--------------------------------------------------------------------------------
 * This function takes two arguments:
 *   1) Comparator Function
 *       Takes as its argument a pair (two-tuple) 
@@ -331,11 +327,10 @@ val mergesort_TEST =
     test(mergesort (fn (x,y) => (x >= y)) [3,2,1,7,2],  [7,3,2,2,1])
   )
 
-(*----------------------------------------------------------------*)
-
 (*
-* PRACTICE WITH DATATYPES
-* -----------------------
+================================================================================
+PRACTICE WITH DATATYPES
+--------------------------------------------------------------------------------
 * Define an ML datatype: 
 *   datatype either = ImAString of string | ImAnInt of int
 * 
@@ -360,58 +355,55 @@ val mergesort_TEST =
 *)
 
 datatype either = ImAString of string | ImAnInt of int
+datatype eitherTree = LEAF of either | BRANCH of eitherTree * eitherTree
 
-datatype eitherTree =
-    Empty
-  | Leaf of either
-  | Branch of eitherTree * eitherTree
-
-fun eitherSearch (Empty) n = false 
-  | eitherSearch Leaf(ImAString data) n = false
-  | eitherSearch Leaf(ImAnInt data) n = (data = n)
-  | eitherSearch Branch(left, right) n =
+fun eitherSearch (LEAF(ImAString data)) n = false
+  | eitherSearch (LEAF(ImAnInt data)) n = (data = n)
+  | eitherSearch (BRANCH(left, right)) n =
       (eitherSearch left n) orelse (eitherSearch right n)
 
-    (*
-fun eitherSearch (n, Empty) = false 
-  | eitherSearch (n, Leaf(data)) = (n = data) 
-  | eitherSearch (n, Branch(left, right)) =
-      eitherSearch(n, left) orelse eitherSearch(n, right)
-      *)
-
+(* fun eitherTest() = *)
 val eitherTest =
   let
-    (*
-    val F = Branch ("one", "two")
-    val G = Branch ("three", "four")
-    val H = Branch ("five", 1)
-    val I = Branch (2, 3)
+    (* Data *)
+    val Ls1 = LEAF (ImAString "one") 
+    val Ls2 = LEAF (ImAString "two")
+    val Ls3 = LEAF (ImAString "three")
+    val Ls4 = LEAF (ImAString "four")
+    val Ls5 = LEAF (ImAString "five")
+    val Ln1 = LEAF (ImAnInt 1)
+    val Ln2 = LEAF (ImAnInt 2)
+    val Ln3 = LEAF (ImAnInt 3)
+    val Ln4 = LEAF (ImAnInt 4)
+    val Ln5 = LEAF (ImAnInt 5)
 
-    val D = Branch (F, G)
-    val E = Branch (H, I)
+    (* Level 4 *)
+    val F = BRANCH (Ls1, Ls2)
+    val G = BRANCH (Ls3, Ls4)
+    val H = BRANCH (Ls5, Ln1)
+    val I = BRANCH (Ln2, Ln3)
 
-    val B = Branch (D, E)
-    val C = Branch (4, 5)
+    (* Level 3 *)
+    val D = BRANCH (F, G)
+    val E = BRANCH (H, I)
 
-    val A = Branch (B, C)
-    *)
-    val s1 = ImAString "one"
-    val n1 = ImAnInt 1
+    (* Level 2 *)
+    val B = BRANCH (D, E)
+    val C = BRANCH (Ln4, Ln5)
 
-    val L1 = Leaf s1
-    val L2 = Leaf n1
-
-    val A = Branch(L1, L2)
+    (* Level 1 *)
+    val A = BRANCH (B, C)
   in
     (
-      eitherSearch A 1
+      (eitherSearch A 1),
+      (eitherSearch A 8)
     )
   end
-(*----------------------------------------------------------------*)
 
 (*
+================================================================================
 TREETOSTRING
-------------
+--------------------------------------------------------------------------------
 A polymorphic tree type, with data only at the leaves, 
 in SML might be represented using:
 
@@ -435,119 +427,87 @@ For this function, you may use built-in functions
 map and String.concat in addition to the generally allowable 
 functions listed above.
 
-We suggest that you start by solving a simpler non-polymorphic problem using
-
-  datatype Tree = LEAF of string | NODE of Tree list
-
-Since the leaves in this simpler problem are already strings 
-you don't need the function argument but you can see the 
-overall structure of the solution. 
-Then make the datatype polymorphic and add the
-function parameter.
-
-Hint: The whole function is neatly expressed as two lines of code.
-
-Here is some test data:
-
-val L1a = LEAF "a"
-val L1b = LEAF "b"
-val L1c = LEAF "c"
-val L2a = NODE [L1a, L1b, L1c]
-val L2b = NODE [L1b, L1c, L1a]
-val L3 = NODE [L2a, L2b, L1a, L1b]
-val L4 = NODE [L1c, L1b, L3]
-val L5 = NODE [L4]
-val iL1a = LEAF 1
-val iL1b = LEAF 2
-val iL1c = LEAF 3
-val iL2a = NODE [iL1a, iL1b, iL1c]
-val iL2b = NODE [iL1b, iL1c, iL1a]
-val iL3 = NODE [iL2a, iL2b, iL1a, iL1b]
-val iL4 = NODE [iL1c, iL1b, iL3]
-val iL5 = NODE [iL4]
-
-treeToString String.toString L5 should produce "((cb((abc)(bca)ab)))" 
-treeToString Int.toString iL5 should produce "((32((123)(231)12)))".
-
-Note that interactive SML systems typically do not print all of 
-the contents of deeply nested data structures. 
-So after evaluating the declaration for il5 
-the response may be something like:
-
-  val iL5 = NODE [NODE [LEAF #,LEAF #,NODE #]] : int Tree
-
-depending on what SML system you are using (in this case SMLofNJ).
-
-Additional information about string manipulation: 
 the ^ infix operator concatenates two strings, thus:
+    "abc" ^ "def"
+    "abcdef"
 
-- "abc" ^ "def";
-"abcdef"
-
-and String.concat concatenates all of the strings in a list of strings. 
-Thus:
-
-- String.concat ["abc", "def", "ghi"];
-"abcdefghi"
+String.concat concatenates all of the strings in a list of strings:
+    String.concat ["abc", "def", "ghi"]
+    "abcdefghi"
 *)
 
-datatype Tree = LEAF of string | NODE of Tree list
-(* datatype 'a Tree = LEAF of 'a | NODE of ('a Tree) list *)
+datatype 'a Tree = LEAF of 'a | NODE of ('a Tree) list
 
-val L1a = LEAF "a"
-val L1b = LEAF "b"
-val L1c = LEAF "c"
-val L2a = NODE [L1a, L1b, L1c]
-val L2b = NODE [L1b, L1c, L1a]
-val L3 = NODE [L2a, L2b, L1a, L1b]
-val L4 = NODE [L1c, L1b, L3]
-val L5 = NODE [L4]
-val iL1a = LEAF 1
-val iL1b = LEAF 2
-val iL1c = LEAF 3
-val iL2a = NODE [iL1a, iL1b, iL1c]
-val iL2b = NODE [iL1b, iL1c, iL1a]
-val iL3 = NODE [iL2a, iL2b, iL1a, iL1b]
-val iL4 = NODE [iL1c, iL1b, iL3]
-val iL5 = NODE [iL4]
-
-fun treeToString LEAF(string str) =
-  | treeToString NODE(tree (cur :: rest)) =
-
-
+fun treeToString f (LEAF data) = f data 
+  | treeToString f (NODE treeList) =
+      "(" ^ (String.concat (map (treeToString f) treeList)) ^ ")"
+      
 val treeToString_TEST = 
-  (
-    test(treeToString String.toString L5,  "((cb((abc)(bca)ab)))"),
-    test(treeToString Int.toString iL5,    "((32((123)(231)12)))")
-  )
+  let 
+    val L1a = LEAF "a"
+    val L1b = LEAF "b"
+    val L1c = LEAF "c"
+    val L2a = NODE [L1a, L1b, L1c]
+    val L2b = NODE [L1b, L1c, L1a]
+    val L3 = NODE [L2a, L2b, L1a, L1b]
+    val L4 = NODE [L1c, L1b, L3]
+    val L5 = NODE [L4]
+    val iL1a = LEAF 1
+    val iL1b = LEAF 2
+    val iL1c = LEAF 3
+    val iL2a = NODE [iL1a, iL1b, iL1c]
+    val iL2b = NODE [iL1b, iL1c, iL1a]
+    val iL3 = NODE [iL2a, iL2b, iL1a, iL1b]
+    val iL4 = NODE [iL1c, iL1b, iL3]
+    val iL5 = NODE [iL4]
+  in
+    (
+      test(treeToString String.toString L5,  "((cb((abc)(bca)ab)))"),
+      test(treeToString Int.toString iL5,    "((32((123)(231)12)))")
+    )
+  end
     
-(*----------------------------------------------------------------*)
-
-fun eitherSearch (Empty) n = false 
-  | eitherSearch Leaf(ImAString data) n = false
-  | eitherSearch Leaf(ImAnInt data) n = (data = n)
-  | eitherSearch Branch(left, right) n =
-      (eitherSearch left n) orelse (eitherSearch right n)
-
 (*
-* PERMS
-* -----
-* Function perms is given a list, l, and returns a list of lists, each of the sublists being one of the length(l)!
-* permutations of l. The permutations may be in any order.
+================================================================================
+PERMS
+--------------------------------------------------------------------------------
+* Function perms is given a list, l, and returns a list of lists, 
+* each of the sublists being one of the length(l)!
+* permutations of l. 
+*
+* The permutations may be in any order.
 *)
-
+      fun insertEverywhere [] = [[0]]
+        | insertEverywhere (y::ys) = 
+          let
+            fun consY list = y::list
+          in
+            (0::y::ys) :: (map consY (insertEverywhere ys))
+          end
 (*
-fun perms L
+fun perms [] = [[]]
+  | perms (x::xs) = 
+    let
+      fun insertEverywhere [] = [[x]]
+        | insertEverywhere (y::ys) = 
+          let
+            fun consY list = y::list
+          in
+            (x::y::ys) :: (map consY (insertEverywhere ys))
+          end
+      in
+        List.concat (map insertEverywhere (perms xs))
+      end
 
 val perms_TEST = 
   (
     test(perms [],       [[]]),
     test(perms [1],      [[1]]),
     test(perms [1,2],    [[1,2], [2,1]]),
-    test(perms [1,2,3],  [[1,2,3], [1,3,2], [2,1,3], 
-                          [2,3,1], [3,1,2], [3,2,1]])
+    test(perms [1,2,3],  [[1,2,3], [1,3,2], [2,1,3], [2,3,1], [3,1,2], [3,2,1]])
+                         [[1,2,3], [2,1,3], [2,3,1], [1,3,2], [3,1,2], [3,2,1]]
   )
-*)
+    *)
 
 (* MIGHT NOT BE NEEDED - CONSIDER REMOVING
 
