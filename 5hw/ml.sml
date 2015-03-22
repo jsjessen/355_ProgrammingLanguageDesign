@@ -57,8 +57,7 @@ val in_list_TEST =
 
 fun intersection(L1, L2) =
     let
-      fun help([], [], result) = result 
-        | help(L1, [], result) = result 
+      fun help(L1, [], result) = result 
         | help([], L2, result) = result 
         | help(cur :: rest, L2, result) =
             if in_list(cur, L2)
@@ -305,9 +304,9 @@ fun mergesort comp [] = []
         | split [single] = ([single], [])
         | split (even :: odd :: rest) =
           let
-           val (L1, L2) = split rest 
+           val (evenList, oddList) = split rest 
           in
-            (even :: L1, odd :: L2)
+            (even :: evenList, odd :: oddList)
           end
 
       val (L1, L2) = split L 
@@ -360,34 +359,90 @@ val mergesort_TEST =
 *     a value that is not present in the tree
 *)
 
-(*
- datatype either = ImAString of string | ImAnInt of int
-*)
+datatype either = ImAString of string | ImAnInt of int
 
+datatype eitherTree =
+    Empty
+  | Leaf of either
+  | Branch of eitherTree * eitherTree
+
+fun eitherSearch (Empty) n = false 
+  | eitherSearch Leaf(ImAString data) n = false
+  | eitherSearch Leaf(ImAnInt data) n = (data = n)
+  | eitherSearch Branch(left, right) n =
+      (eitherSearch left n) orelse (eitherSearch right n)
+
+    (*
+fun eitherSearch (n, Empty) = false 
+  | eitherSearch (n, Leaf(data)) = (n = data) 
+  | eitherSearch (n, Branch(left, right)) =
+      eitherSearch(n, left) orelse eitherSearch(n, right)
+      *)
+
+val eitherTest =
+  let
+    (*
+    val F = Branch ("one", "two")
+    val G = Branch ("three", "four")
+    val H = Branch ("five", 1)
+    val I = Branch (2, 3)
+
+    val D = Branch (F, G)
+    val E = Branch (H, I)
+
+    val B = Branch (D, E)
+    val C = Branch (4, 5)
+
+    val A = Branch (B, C)
+    *)
+    val s1 = ImAString "one"
+    val n1 = ImAnInt 1
+
+    val L1 = Leaf s1
+    val L2 = Leaf n1
+
+    val A = Branch(L1, L2)
+  in
+    (
+      eitherSearch A 1
+    )
+  end
 (*----------------------------------------------------------------*)
 
 (*
 TREETOSTRING
 ------------
-A polymorphic tree type, with data only at the leaves, in SML might be represented using
+A polymorphic tree type, with data only at the leaves, 
+in SML might be represented using:
 
-datatype 'a Tree = LEAF of 'a | NODE of ('a Tree) list
+  datatype 'a Tree = LEAF of 'a | NODE of ('a Tree) list
 
-Write a function treeToString: ('a -> string) -> 'a Tree -> string that returns a
-parenthesized string representing an arbitrary Tree. treeToString is invoked as treeToString f t
-where f is a function that converts data of type 'a to a string and t is an 'a Tree. The
-parenthesization rules implemented by treeToString are as follows:
+Write a function treeToString:  
 
-• For a LEAF node, the returned value is just f the-data-in-the-leaf.
-• For a LIST node, concatenate the strings produced by treeToString on the elements of the list
-and surround the resulting string with parentheses. For this function, you may use built-in functions map and String.concat in addition to the generally allowable functions listed above.
+  ('a -> string) -> 'a Tree -> string 
+
+that returns a parenthesized string representing an arbitrary Tree. 
+treeToString is invoked as treeToString f t,
+where f is a function that converts data of type 'a to a string 
+and t is an 'a Tree. 
+The parenthesization rules implemented by treeToString are as follows:
+  • For a LEAF node, the returned value is just f the-data-in-the-leaf.
+  • For a LIST node, concatenate the strings produced 
+    by treeToString on the elements of the list and surround the 
+    resulting string with parentheses. 
+
+For this function, you may use built-in functions 
+map and String.concat in addition to the generally allowable 
+functions listed above.
 
 We suggest that you start by solving a simpler non-polymorphic problem using
 
-datatype Tree = LEAF of string | NODE of Tree list
+  datatype Tree = LEAF of string | NODE of Tree list
 
-Since the leaves in this simpler problem are already strings you don't need the function argument but
-you can see the overall structure of the solution. Then make the datatype polymorphic and add the
+Since the leaves in this simpler problem are already strings 
+you don't need the function argument but you can see the 
+overall structure of the solution. 
+Then make the datatype polymorphic and add the
 function parameter.
 
 Hint: The whole function is neatly expressed as two lines of code.
@@ -411,27 +466,68 @@ val iL3 = NODE [iL2a, iL2b, iL1a, iL1b]
 val iL4 = NODE [iL1c, iL1b, iL3]
 val iL5 = NODE [iL4]
 
-treeToString String.toString L5 should produce "((cb((abc)(bca)ab)))" and
+treeToString String.toString L5 should produce "((cb((abc)(bca)ab)))" 
 treeToString Int.toString iL5 should produce "((32((123)(231)12)))".
 
-Note that interactive SML systems typically do not print all of the contents of deeply nested data
-structures. So after evaluating the declaration for il5 the response may be something like
+Note that interactive SML systems typically do not print all of 
+the contents of deeply nested data structures. 
+So after evaluating the declaration for il5 
+the response may be something like:
 
-val iL5 = NODE [NODE [LEAF #,LEAF #,NODE #]] : int Tree
+  val iL5 = NODE [NODE [LEAF #,LEAF #,NODE #]] : int Tree
 
 depending on what SML system you are using (in this case SMLofNJ).
-Additional information about string manipulation: the ^ infix operator concatenates two strings, thus:
+
+Additional information about string manipulation: 
+the ^ infix operator concatenates two strings, thus:
 
 - "abc" ^ "def";
 "abcdef"
 
-and String.concat concatenates all of the strings in a list of strings. Thus:
+and String.concat concatenates all of the strings in a list of strings. 
+Thus:
 
 - String.concat ["abc", "def", "ghi"];
 "abcdefghi"
 *)
 
+datatype Tree = LEAF of string | NODE of Tree list
+(* datatype 'a Tree = LEAF of 'a | NODE of ('a Tree) list *)
+
+val L1a = LEAF "a"
+val L1b = LEAF "b"
+val L1c = LEAF "c"
+val L2a = NODE [L1a, L1b, L1c]
+val L2b = NODE [L1b, L1c, L1a]
+val L3 = NODE [L2a, L2b, L1a, L1b]
+val L4 = NODE [L1c, L1b, L3]
+val L5 = NODE [L4]
+val iL1a = LEAF 1
+val iL1b = LEAF 2
+val iL1c = LEAF 3
+val iL2a = NODE [iL1a, iL1b, iL1c]
+val iL2b = NODE [iL1b, iL1c, iL1a]
+val iL3 = NODE [iL2a, iL2b, iL1a, iL1b]
+val iL4 = NODE [iL1c, iL1b, iL3]
+val iL5 = NODE [iL4]
+
+fun treeToString LEAF(string str) =
+  | treeToString NODE(tree (cur :: rest)) =
+
+
+val treeToString_TEST = 
+  (
+    test(treeToString String.toString L5,  "((cb((abc)(bca)ab)))"),
+    test(treeToString Int.toString iL5,    "((32((123)(231)12)))")
+  )
+    
 (*----------------------------------------------------------------*)
+
+fun eitherSearch (Empty) n = false 
+  | eitherSearch Leaf(ImAString data) n = false
+  | eitherSearch Leaf(ImAnInt data) n = (data = n)
+  | eitherSearch Branch(left, right) n =
+      (eitherSearch left n) orelse (eitherSearch right n)
 
 (*
 * PERMS
