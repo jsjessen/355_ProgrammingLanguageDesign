@@ -256,42 +256,6 @@ MERGESORT
 * Type : ('a * 'a -> bool) -> 'a list -> 'a list 
 *)
 
-(*
-fun merge [] [] = [] 
-  | merge L1 [] = L1
-  | merge [] L2 = L2
-  | merge (cur1 :: rest1) (cur2 :: rest2) =
-      if cur1 < cur2
-        then cur1 :: (merge rest1 (cur2 :: rest2))
-        else cur2 :: (merge rest2 (cur1 :: rest1))
-
-val merge_TEST = 
-  (
-    test(merge [] [1,2],         [1,2]),
-    test(merge [1,2] [],         [1,2]),
-    test(merge [1,3,5] [2,4,8],  [1,2,3,4,5,8]), 
-    test(merge [1,3,6] [2,4,5],  [1,2,3,4,5,6])
-  )
-
-fun split []  = ([], [])
-  | split [single] = ([single], [])
-  | split (first :: second :: rest) =
-    let
-      val (L1, L2) = split rest 
-    in
-      (first :: L1, second :: L2)
-    end
-
-val split_TEST = 
-  (
-    test(split [],         ([], [])),
-    test(split [1],        ([1], [])),
-    test(split [1,3],      ([1], [3])),
-    test(split [1,3,6],    ([1,6], [3])),
-    test(split [1,3,6,7],  ([1,6], [3,7]))
-  )
-  *)
-
 fun mergesort comp [] = []
   | mergesort comp [single] = [single]
   | mergesort comp L = 
@@ -300,7 +264,7 @@ fun mergesort comp [] = []
         | split [single] = ([single], [])
         | split (even :: odd :: rest) =
           let
-           val (evenList, oddList) = split rest 
+            val (evenList, oddList) = split rest 
           in
             (even :: evenList, odd :: oddList)
           end
@@ -362,7 +326,10 @@ fun eitherSearch (LEAF(ImAString data)) n = false
   | eitherSearch (BRANCH(left, right)) n =
       (eitherSearch left n) orelse (eitherSearch right n)
 
-(* fun eitherTest() = *)
+(*
+  It doesn't seem to like it as a function:
+  fun eitherTest() =
+*)
 val eitherTest =
   let
     (* Data *)
@@ -417,15 +384,14 @@ that returns a parenthesized string representing an arbitrary Tree.
 treeToString is invoked as treeToString f t,
 where f is a function that converts data of type 'a to a string 
 and t is an 'a Tree. 
+
 The parenthesization rules implemented by treeToString are as follows:
   • For a LEAF node, the returned value is just f the-data-in-the-leaf.
   • For a LIST node, concatenate the strings produced 
     by treeToString on the elements of the list and surround the 
     resulting string with parentheses. 
 
-For this function, you may use built-in functions 
-map and String.concat in addition to the generally allowable 
-functions listed above.
+For this function, you may use built-in functions map and String.concat
 
 the ^ infix operator concatenates two strings, thus:
     "abc" ^ "def"
@@ -477,49 +443,43 @@ PERMS
 *
 * The permutations may be in any order.
 *)
-      fun insertEverywhere [] = [[0]]
-        | insertEverywhere (y::ys) = 
-          let
-            fun consY list = y::list
-          in
-            (0::y::ys) :: (map consY (insertEverywhere ys))
-          end
+
 (*
-fun perms [] = [[]]
-  | perms (x::xs) = 
+fun insertEverywhere [] = [[0]]
+  | insertEverywhere (y::ys) = 
     let
+      fun consY list = y::list
+    in
+      (0::y::ys) :: (map consY (insertEverywhere ys))
+    end
+*)
+
+fun perms [] = [[]]
+  | perms (x :: xs) = 
+    let
+      fun myMap f [] = []
+        | myMap f (cur :: rest) = (f cur) :: (myMap f rest)
+
+      (* fun myConcat *)
+
       fun insertEverywhere [] = [[x]]
-        | insertEverywhere (y::ys) = 
+        | insertEverywhere (y :: ys) = 
           let
-            fun consY list = y::list
+            fun consY L = y :: L 
           in
-            (x::y::ys) :: (map consY (insertEverywhere ys))
+            (x :: y :: ys) :: (myMap consY (insertEverywhere ys))
           end
-      in
-        List.concat (map insertEverywhere (perms xs))
-      end
+    in
+      (* remove 'List.concat' and see output, 
+      *  then design myConcat accordingly *)
+      List.concat (myMap insertEverywhere (perms xs))
+    end
 
 val perms_TEST = 
   (
     test(perms [],       [[]]),
     test(perms [1],      [[1]]),
     test(perms [1,2],    [[1,2], [2,1]]),
-    test(perms [1,2,3],  [[1,2,3], [1,3,2], [2,1,3], [2,3,1], [3,1,2], [3,2,1]])
-                         [[1,2,3], [2,1,3], [2,3,1], [1,3,2], [3,1,2], [3,2,1]]
+    test(perms [1,2,3],  [[1,2,3], [2,1,3], [2,3,1], [1,3,2], [3,1,2], [3,2,1]])
+                      (* [[1,2,3], [1,3,2], [2,1,3], [2,3,1], [3,1,2], [3,2,1]]) *)
   )
-    *)
-
-(* MIGHT NOT BE NEEDED - CONSIDER REMOVING
-
-fun length [] = 0
-  | length (cur :: rest) = 1 + length rest 
-
-val length_TEST = 
-  (
-    test(length [],               0),
-    test(length [1],              1),
-    test(length [1, 2],           2),
-    test(length [1, 2, 3, 4, 5],  5)
-  )
-
-*)
