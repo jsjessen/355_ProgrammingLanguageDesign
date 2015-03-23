@@ -28,9 +28,7 @@ IN_LIST
 
 fun in_list(target, []) = false
   | in_list(target, cur :: rest) = 
-      if cur = target 
-        then true 
-        else in_list(target, rest)
+      (cur = target) orelse in_list(target, rest)
 
 val in_list_TEST = 
   (
