@@ -118,6 +118,16 @@ there are N mappings(->) in the type.
     Define an ML function that returns _______________ if _______ and
     returns _________ if ___________.
 
+    fun lookup(k, table) =
+      let
+        fun find pred [] = 0 
+          | find pred (x :: xs) = 
+            if (pred x)
+              then #2(x)
+              else find pred xs;
+      in
+        find (fn (key, value) => (key = k)) table
+      end
 
 4) Parsing
 
@@ -165,10 +175,31 @@ there are N mappings(->) in the type.
 
        Define a Scheme function _______ which produces __________ .
 
+        (define (lookup L key) 
+          (cond 
+            ((= (car(car L)) key) car(car(cdr(car L))))
+            (#t (lookup (cdr L) key))
+            ))
+
+        (lookup table 14) = 5
+
     b) Define the _____ function in Scheme that takes a _______ and a
        ______ as arguments and returns ______________.
 
             Understand general functions such as map and fold.
+
+        (define (mymap f x)
+            (cond
+                ((null? x) '())
+                (#t (cons (f (car x)) (mymap f (cdr x))))
+            )
+        ) 
+
+        (define (fold fcombine basecase L)
+            (cond
+                ((null? L) basecase)
+                (#t (fcombine (car L) (fold fcombine basecase (cdr L))))
+        ))
 
 6) ML function
 

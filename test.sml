@@ -1,13 +1,9 @@
-
-
 fun lookup(k, table) =
   let
-    fun getValue (bob, frank) = frank 
-
     fun find pred [] = 0 
       | find pred (x :: xs) = 
-        if pred x 
-          then getValue x
+        if (pred x)
+          then #2(x)
           else find pred xs;
   in
     find (fn (key, value) => (key = k)) table
