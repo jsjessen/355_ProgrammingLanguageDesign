@@ -1,0 +1,198 @@
+Exam 2 - Cheatsheet
+===================
+
+--------------------------------------------------------------------------------
+If x + 1, then x is an int becuase 1 is an int.
+
+A tuple (a,b) has type: 'a * 'a
+
+val foo = fn x => x + 2; (fn = lambda)
+fun foo x = x + 2; (shorthand function declaration)
+
+Normal:  fun (x,y) = ...
+Curried: fun  x y  = ...
+
+Non-curried
+fun foo (x,y,z) = x + y + z + 1
+type: int * int * int
+       x     y     z
+
+Curried
+fun foo x y z = x + y + z + 1
+type: int -> int -> int -> int 
+       x      y      z     result 
+
+If a function is in curried form with N input arguements, 
+there are N mappings(->) in the type.
+--------------------------------------------------------------------------------
+
+1) Types and type sub-language
+
+    a) What is the ML type of (5, [3], true)?
+       ANSWER: int * int list * bool
+
+    b) What is the ML type of f after the declaration: fun f (x,y) = x + y
+       ANSWER: int * int -> int 
+
+       What is the type of the function defined by:
+
+         fun f x = x + 1
+                  x  =  result
+         ANSWER: int -> int
+
+         fun (x,y) = (x+1, y+1)
+                 (x  ,  y)  =  (result)
+         ANSWER: int * int -> int * int
+
+         fun f x y = (x+1, y+1)
+                  x      y      (result)
+         ANSWER: int -> int -> int * int
+
+         fun f x y = (x y)
+                 (   x    )    (y) =  result
+         ANSWER: ('a -> 'b) -> 'a -> 'b
+
+         fun f x y = (y x)
+         Error: The function is given before the argument.
+
+         fun f (x,y) = (x (y 2))
+         ANSWER: (   x    ) , (    y    )  =  result
+                 ('a -> 'b) * (int -> 'a) -> 'b
+
+                 fun f x y z = (x y) (z 2)
+                 (       x      )    (y)   (    z    )  =  result
+         ANSWER: ('a -> 'b -> 'c) -> 'a -> (int -> 'b) -> 'c
+
+                 fun f x y = x (y [])
+                 (   x    )    (      y      )  =  result
+         ANSWER: ('a -> 'b)    ('c list -> 'a) -> 'b
+
+                 fun f x y [] = x (y [])
+                   | f x y (z :: zs) = z :: (x (y zs))
+                 (      x      )    (      y      )    ( List )    result
+         ANSWER: ('a -> 'b list) -> ('b list -> 'a) -> 'b list -> 'b list 
+
+    d) Understand anonymous functions.
+
+       fn x => x*x
+       it 3 = 9
+
+    e) Properties of a tuple:
+
+        Fixed number of ordered items of POSSIBLY DIFFERENT TYPES.
+        The function  #i ,  i >= 1, can be applied to any tuple which has at least i
+        elements; it returns the i’th element.
+
+    f) Properties of a list:
+
+        [] and nil are both the empty list
+
+        A list can have arbitrary number of items, but all the items must have the same
+        type.
+
+2) Function on a given data type
+ 
+    Given data type T:
+    Define a function listify having type ____, that returns ___ of ___.
+
+    datatype 'label btree = Empty | Node of 'label * 'label btree * 'label btree
+    datatype 'a btree = Empty | Node of 'a * 'a btree * 'a btree
+
+    > val D = Node ("D", Empty, Empty);
+    val D = Node ("D", Empty, Empty): string btree
+
+    datatype either = ImAString of string | ImAnInt of int
+    datatype eitherTree = LEAF of either | BRANCH of eitherTree * eitherTree
+    
+    fun eitherSearch (LEAF(ImAString data)) n = false
+      | eitherSearch (LEAF(ImAnInt data)) n = (data = n)
+      | eitherSearch (BRANCH(left, right)) n =
+          (eitherSearch left n) orelse (eitherSearch right n)
+
+3) ML list processing
+
+    An ML list such as  [(1,4), (14,5), (7,3), (22,6)]  can
+    be used to represent a lookup table where the first value of each pair is
+    the key and the second value is the associated value.
+    
+    Define an ML function that returns _______________ if _______ and
+    returns _________ if ___________.
+
+
+4) Parsing
+
+    a) Draw a derivation tree for the sentence:  / * Y Y X 
+
+       using the grammar given below. Assume that <e> is the start symbol.
+       Note that arithmetic here is expressed in prefix notation 
+       so ( – 3 10) is -7 , ( * 2 3)  is  6 , etc.
+       
+       <s_list> -> <s> | <s> ; <s_list>
+            <s> -> <t> = <e>
+            <e> -> <mulop> <e> <t> | <t>
+        <mulop> -> * | /
+            <t> -> X | Y
+
+                                    <s_list> 
+                                       |
+                                       s
+                                  /    |    \
+       Example tree not in       t     =     e
+       prefix notation but       |        /  |  \
+       you get the idea          X       e   *   e
+                                       / | \     |
+                                      e  /  e    X
+                                      |     |
+                                      t     t
+                                      |     |
+                                      Y     Y
+
+    b) Using the tree you have drawn above determine the value of the
+       expression / * 8 8 3 according to this grammar. Show
+       how you derived your answer.
+
+       (* (\ 8 8) 3) = ((8/8)*3) = 3
+
+5) Scheme
+
+    car = first item of list
+    cdr = rest of the list
+    cons = create a new list combining
+
+    a) A Scheme list such as ((1 4) (14 5) (7 3) (22 6)) can be used to
+       represent a lookup table where the first value of each pair is the key and
+       the second value is the associated value.
+
+       Define a Scheme function _______ which produces __________ .
+
+    b) Define the _____ function in Scheme that takes a _______ and a
+       ______ as arguments and returns ______________.
+
+            Understand general functions such as map and fold.
+
+6) ML function
+
+    You are given an ML function defined as:
+
+        fun foldl f z [] = z
+          | foldl f z (x :: xs) = (foldl f (f z x)) xs
+        
+        fun foldr f [] z = z
+          | foldr f (x :: xs) z = (f x (foldr f xs z))
+
+        fun map f [] = []
+          | map f (x :: xs) = (f x) :: (map f xs)
+    
+    a) What is the ML type of the function?
+
+        foldl: ('a -> 'b -> 'a) -> 'a -> 'b list -> ')
+        foldr: (‘a -> ‘b -> ’b) -> ‘a list -> ‘b –> ’b
+        map: ('a -> 'b) -> 'a list -> 'b list
+
+    b) Using the given function define a function that returns _____________.
+
+    c) Using the given function define a function that returns _____________.
+
+    d) Is the function defined in question 6 tail-recursive? Why or why not?
+
+            foldl IS tail recursive, but foldr IS NOT tail recursive

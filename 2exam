@@ -8,10 +8,10 @@ Can have a cheetsheet!
     determine type of ML thing
     write int*bool instead of tuple
 
-    What is the type of (5, [3], true)?
+ a. What is the type of (5, [3], true)?
     Ans: int*int list*bool (is tuple, but don't write tuple)
 
-    What is the ML type of f after the declaration?
+ b. What is the ML type of f after the declaration?
     fun f (x, y) = x + y (not curried form)
     Ans: int*int->int
 
@@ -39,7 +39,8 @@ Can have a cheetsheet!
     we don't know y so use 'a
     but we know x is a function applied to y, where y is 'a
     we don't know what function x maps to, so we use 'b
-    fun f x y = (y x) would result in an error because you get the function before the argument 
+    fun f x y = (y x) would result in an error because 
+    you get the function before the argument 
 
     What is the type of the function defined by:
     fun f (x,y) = (x (y 2))
@@ -62,6 +63,7 @@ Can have a cheetsheet!
     It will be applied to int, see what it returns
 
     e) A multiple choice question related to a general property of a tuple.
+
     f) A multiple choice question related to a general property of a list.
 
 2) Function on a given datatype
@@ -72,21 +74,23 @@ Can have a cheetsheet!
 
 3) ML list processing
 
-    "An ML list such as [(1,4), (14,5), (7,3), ... ] can be used to represent a lookup table where the first value of each pair is the key and the second value is the associated value." - the test
+    "An ML list such as [(1,4), (14,5), (7,3), (22,6)] can be used to represent 
+    a lookup table where the first value of each pair is the key and 
+    the second value is the associated value."
 
     Define an ML function that returns ___ if ___ and returns ___ if ___.
 
 4) Parsing
 
-    a) Draw a derivation tree of the sentence
-       __________
+    a) Draw a derivation tree of the sentence _______________________
 
        using the grammar given below. Assume that <e> is the start symbol. 
        
        It will be prefix notation.
        Just look at substitution rules and apply them.
 
-       Noe that the arithmetic here is expressed in prefix notation so (- 3 10) is -7, (* 2 3) is 6, etc.
+       Note that the arithmetic here is expressed in prefix 
+       notation so (- 3 10) is -7, (* 2 3) is 6, etc.
 
        Meticulously and mindlessly apply the grammar
 
@@ -95,11 +99,17 @@ Can have a cheetsheet!
        ...
        ...
 
-    b) Using the tree you have drawn above determine the value of the expression _____ according to this grammar. Show how you derived your answer (start from beginning, put parenthesis).
+    b) Using the tree you have drawn above determine the value of the 
+       expression _____ according to this grammar. 
+
+       Show how you derived your answer (start from beginning, put parenthesis).
 
 5) Scheme
 
-    "An Scheme list such as [(1,4), (14,5), (7,3), ... ] can be used to represent a lookup table where the first value of each pair is the key and the second value is the associated value." - the test (Same as ML question but in Scheme)
+    "An Scheme list such as [(1,4), (14,5), (7,3), (22,6)] can be used to represent 
+    a lookup table where the first value of each pair is the key and 
+    the second value is the associated value." 
+    (Same as ML question but in Scheme)
 
     b) Define a Scheme function that returns ___ if ___ and returns ___ if ___. 
 
@@ -118,7 +128,8 @@ Can have a cheetsheet!
 
     a) What is the ML type of the function?
 
-            Be able to figure out the type of a function that is recursively called, such as map or fold.
+            Be able to figure out the type of a function that is 
+            recursively called, such as map or fold.
 
     b) Using the given function define a function that returns _______.
 
