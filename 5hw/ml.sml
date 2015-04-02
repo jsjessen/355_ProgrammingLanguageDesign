@@ -326,11 +326,7 @@ fun eitherSearch (LEAF(ImAString data)) n = false
   | eitherSearch (BRANCH(left, right)) n =
       (eitherSearch left n) orelse (eitherSearch right n)
 
-(*
-  It doesn't seem to like it as a function:
-  fun eitherTest() =
-*)
-val eitherTest =
+fun eitherTest() =
   let
     (* Data *)
     val Ls1 = LEAF (ImAString "one") 
@@ -366,6 +362,8 @@ val eitherTest =
       (eitherSearch A 8)
     )
   end
+
+val eitherSearch_TEST = test(eitherTest(),  (true, false))
 
 (*
 ================================================================================
@@ -444,35 +442,21 @@ PERMS
 * The permutations may be in any order.
 *)
 
-(*
-fun insertEverywhere [] = [[0]]
-  | insertEverywhere (y::ys) = 
-    let
-      fun consY list = y::list
-    in
-      (0::y::ys) :: (map consY (insertEverywhere ys))
-    end
-*)
-
 fun perms [] = [[]]
   | perms (x :: xs) = 
     let
       fun myMap f [] = []
         | myMap f (cur :: rest) = (f cur) :: (myMap f rest)
 
-      (* fun myConcat *)
-
-      fun insertEverywhere [] = [[x]]
-        | insertEverywhere (y :: ys) = 
+      fun insert [] = [[x]]
+        | insert (y :: ys) =
           let
-            fun consY L = y :: L 
+            fun consY L = y :: L
           in
-            (x :: y :: ys) :: (myMap consY (insertEverywhere ys))
+            (x :: y :: ys) :: (myMap consY (insert ys))
           end
     in
-      (* remove 'List.concat' and see output, 
-      *  then design myConcat accordingly *)
-      List.concat (myMap insertEverywhere (perms xs))
+      List.concat (myMap insert (perms xs))
     end
 
 val perms_TEST = 
