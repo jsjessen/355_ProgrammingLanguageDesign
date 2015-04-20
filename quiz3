@@ -1,0 +1,28 @@
+Dynamic vs Static Scoping
+
+    ML uses static scoping.
+
+    1) Given ML code (static scoping): 
+        give output value and reasoning 
+        ML uses static scoping, so the function uses y=4 because that was the state of the environment when function Foo was defined.
+    
+    2) Now suppose ML is using dynamic scoping rules (it doesn't):
+        Give return value and reasoning 
+        Because dynamic scoping is being used, ... is using becuase it is the most recent activation record on the stack
+
+
+Pass-by-value vs Pass-by-reference
+
+    Python uses pass-by-value, but arrays use pointer. Passing an array would behave like pass by reference!
+
+    3) Value:
+        Passes a copy, so changes DON NOT affect the variable passed to the function.
+
+    4) Reference:
+        Passes a pointer, so changes DO affect the variable passed to the function.
+        
+
+Abstract Data Type
+
+    Look at ML Complex Numbers example
+    Note the difference between the use of '+' and 'add'
