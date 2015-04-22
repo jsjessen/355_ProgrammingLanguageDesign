@@ -118,16 +118,11 @@ there are N mappings(->) in the type.
     Define an ML function that returns _______________ if _______ and
     returns _________ if ___________.
 
-    fun lookup(k, table) =
-      let
-        fun find pred [] = 0 
-          | find pred (x :: xs) = 
-            if (pred x)
-              then #2(x)
-              else find pred xs;
-      in
-        find (fn (key, value) => (key = k)) table
-      end
+    fun lookup k [] = 0
+      | lookup k ((key, value) :: xs) = 
+          if key = k
+            then value
+            else lookup k xs
 
 4) Parsing
 
