@@ -17,7 +17,6 @@ class PostScriptStack:
         self.items = []
 
     def __str__(self):
-        """Represent the stack as a string"""
         myString =  '\n     Operand Stack     \n'
         myString += '***********************\n'
         for item in reversed(self.items):

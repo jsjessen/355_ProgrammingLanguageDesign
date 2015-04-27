@@ -19,7 +19,7 @@ class PostScriptDictStack(ps_stack.PostScriptStack):
         self.push({})
 
     def __str__(self):
-        """Represent the dictionary stack as a string"""
+        """Display the contents of the dictionary stack, without modifying it"""
         myString =  '\n    Dictionary Stack   \n'
         myString += '***********************\n'
         for dic in reversed(self.items):
@@ -58,10 +58,10 @@ class PostScriptDictStack(ps_stack.PostScriptStack):
         """Create a new dictionary on the top of the dictionary stack"""
         self.push(newDict)
         return None
-    if check.isDict(newDict):
-        self.push(newDict)
-    else:
-        print(type(newDict).__name__)
+        if check.isDict(newDict):
+            self.push(newDict)
+        else:
+            print(type(newDict).__name__)
             debug.err("Attempting to add non-dict to dictionary stack")
         return None
 
