@@ -19,12 +19,11 @@ class PostScriptStack:
 
     def __str__(self):
         """Represent the stack as a string"""
-        width = disp.WIDTH_SMALL
-        myString = disp.center_title('Operand Stack', width)
-        myString += '*' * width + '\n'
+        # width = disp.WIDTH_MED
+        # myString = disp.center_title('Operand Stack', width)
+        myString = '=' * disp.WIDTH_SMALL + '\n'
         for item in reversed(self.items):
             myString += str(item) + '\n'
-        myString += '-' * width + '\n'
         return myString
 
     def stack(self):

@@ -3,8 +3,8 @@
 import inspect
 
 global debugging
-#debugging = False
-debugging = True
+debugging = False
+#debugging = True
 
 def err(msg):
     print("Error: {0}(): {1}".format(inspect.stack()[1][3], msg))

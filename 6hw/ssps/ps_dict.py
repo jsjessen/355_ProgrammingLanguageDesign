@@ -12,35 +12,35 @@ import check
 import ps_stack
 import debug
 import disp
-import ssps
 
 class PostScriptDictStack(ps_stack.PostScriptStack):
     """PostScript Dictionary Stack"""
     def __init__(self):
         self.items = []
-        self.push({}, -1)
+        self.push({}, -1, 'static')
 
     def __str__(self):
         """Represent the dictionary stack as a string"""
-        width = disp.WIDTH_MED
-        myString = disp.center_title('Dictionary Stack', width)
-        length = self.size() - 2
+        #width = disp.WIDTH_MED
+        #myString = disp.center_title('Dictionary Stack', width)
+        myString = '=' * disp.WIDTH_SMALL + '\n'
+        length = self.size() - 1
         for i, (dic, static_link) in enumerate(reversed(self.items)):
-            if i == length + 1:
-                continue
             index = length - i
+            if static_link < 0:
+                static_link = 0
             myString += '---- ' + str(index)
             myString += ' ---- ' + str(static_link) + ' ----\n'
             for key, value in dic.items():
                 myString += key + ': '
                 if check.isCode(value):
-                    myString += '{ '
+                    myString += '[ '
                     for code in value:
                         myString += code + ' '
-                    myString += '}\n'
+                    myString += ']\n'
                 else:
                     myString += str(value) + '\n'
-        myString += '=' * width + '\n'
+        myString += '=' * disp.WIDTH_SMALL + '\n'
         return myString
 
     def size(self):
@@ -50,12 +50,12 @@ class PostScriptDictStack(ps_stack.PostScriptStack):
     # At the point when a function is called the static link in the new stack entry
     # needs to be set to point to the stack entry where the function’s definition was found.
     # (Note that with the stack being a list, this “pointer” is just an index in the list.)
-    def push(self, dic, link):
+    def push(self, dic, link, scope):
         """Add a new dictionary to the top of the stack"""
         if check.isDict(dic) and check.isNum(link):
-            if ssps.SCOPE_MODE == 'dynamic':
-                self.items.append((dic, self.size()))
-            elif ssps.SCOPE_MODE == 'static':
+            if scope == 'dynamic':
+                self.items.append((dic, self.size() - 1)) # just use index
+            elif scope == 'static':
                 self.items.append((dic, link))
             else:
                 debug.err('unknown scope mode')
@@ -107,6 +107,7 @@ class PostScriptDictStack(ps_stack.PostScriptStack):
         Start at the top dictionary on the stack and follow the link
         Assume the link was made to be dynamic/static when created
         """
+        bottom_dic, bottom_link = self.items[0]
         link_to_me = self.size() - 1
         dic, link_to_parent = self.peek()
         while link_to_me >= 0:
@@ -117,7 +118,7 @@ class PostScriptDictStack(ps_stack.PostScriptStack):
         return None
 
     def defined(self, key):
-        for dic in self.items:
+        for dic, link in self.items:
             if key in dic:
                 return True
         return False

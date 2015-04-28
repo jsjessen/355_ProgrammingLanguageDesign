@@ -31,7 +31,7 @@ def isList(item):
     if isinstance(item, list):
         return True
     else:
-        debug.show("{0} is a {1} not a list.".format(item, type(item).__name__))
+        #debug.show("{0} is a {1} not a list.".format(item, type(item).__name__))
         return False
 
 isCode = isList

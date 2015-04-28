@@ -21,6 +21,7 @@ class PostScriptReader:
     """Describe dict class"""
     def __init__(self):
         debug.show("Initializing reader...")
+        self.scope = 'dynamic' # default scope mode
         self.opStack = ps_stack.PostScriptStack()
         self.dictStack = ps_dict.PostScriptDictStack()
 
@@ -80,9 +81,15 @@ class PostScriptReader:
             t = tokens[p]
             p += 1
 
+            debug.show(self)
+
             # { CODE BLOCK }
             if t == '{':
                 p = self.readCodeBlock(tokens, p)
+
+            # Print the operand and dictionary stacks
+            elif t == 'stack':
+                print(self)
 
             # LOGIC FLOW
             elif hasattr(self, '_' + t):
@@ -104,9 +111,6 @@ class PostScriptReader:
                     self.dictStack.define(key, value)
                 else:
                     sys.exit("Error: '{}' has invalid operands".format(t))
-            #elif t == 'begin':
-            #    debug.show("Top of stack: {}".format(self.opStack.peek()))
-            #    self.dictStack.begin(self.opStack.pop())
             elif hasattr(self.dictStack, t):
                 getattr(self.dictStack, t)()
             elif hasattr(self.dictStack, t + '_'):
@@ -120,9 +124,10 @@ class PostScriptReader:
             elif self.dictStack.defined(t):
                 definition, link = self.dictStack.lookup(t)
                 if check.isCode(definition):
-                    self.dictStack.push({}, link)
+                    self.dictStack.push({}, link, self.scope)
                     self.evaluate(definition) # call function
-                    self.dictStack.pop()      # return from function
+                    if self.scope == 'static':
+                        self.dictStack.pop()      # return from function
                 else:
                     self.opStack.push(definition)
             else:
@@ -131,7 +136,6 @@ class PostScriptReader:
                     self.opStack.push(float(t))
                 except:
                     sys.exit("Error: '{}' is not a valid token".format(t))
-
         return None
 
 

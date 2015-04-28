@@ -13,9 +13,6 @@ import sys
 import ps_reader
 import disp
 
-global SCOPE_MODE
-SCOPE_MODE = 'dynamic' #set defualt
-
 # python3 ssps.py A -s B -d C
 # A executed using dynamic scope rules
 # B executed using static scope rules
@@ -27,10 +24,11 @@ if __name__ == '__main__':
     # Read each file with the assumption that it contains PostScript code
     for arg in sys.argv[1:]:
         if arg == '-d':
-            SCOPE_MODE = 'dynamic'
+            reader.scope = 'dynamic'
         elif arg == '-s':
-            SCOPE_MODE = 'static'
+            reader.scope = 'static'
         else:
+            width = disp.WIDTH_MED
+            print('\n' + disp.center_title(arg + ' ('+ reader.scope + ')', width, '#'))
             reader.read(arg)
-            print(reader)
-            print('#' * disp.WIDTH_BIG + '\n')
+            reader = ps_reader.PostScriptReader()
