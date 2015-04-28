@@ -1,0 +1,20 @@
+/y 4 def
+stack
+
+/g 
+{
+    /x def
+    add y x
+} def
+stack
+
+/f
+{
+    /x def
+    /y 7 def
+    x g
+} def
+stack
+
+10 f
+g 6

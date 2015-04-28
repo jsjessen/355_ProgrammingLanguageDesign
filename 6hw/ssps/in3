@@ -1,0 +1,9 @@
+8 5 sub 
+
+dictz begin
+/joe 3 stack  def
+/fox 4  stack def
+
+dictz begin
+/frank 8 def
+/elec 4  def

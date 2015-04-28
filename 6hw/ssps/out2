@@ -1,0 +1,38 @@
+add fact to dict with {...} as value
+
+def         ---> "fact" added to dict with {...} value
+{...}       
+"fact"
+
+stack empty
+
+fact        ---> check dict for fact and read its value 
+5
+
+
+dictz       ---> create a dict
+5
+
+begin       ---> add the dict to dict stack
+5
+
+def         ---> add "n" with value 5 to dict on top of dict stack
+5
+\n
+
+lt          --> get n from dict, 5 < 2 is false
+2
+n
+
+ifelse     
+{n -1 add fact n mul } execute this part
+{1}
+false
+
+fact        ---> recursive call
+5 + -1 = 4
+
+
+
+
+=           ---> print stack
