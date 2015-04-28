@@ -20,15 +20,17 @@ import disp
 
 if __name__ == '__main__':
     reader = ps_reader.PostScriptReader()
+    scope = 'dynamic'
 
     # Read each file with the assumption that it contains PostScript code
     for arg in sys.argv[1:]:
         if arg == '-d':
-            reader.scope = 'dynamic'
+            scope = 'dynamic'
         elif arg == '-s':
-            reader.scope = 'static'
+            scope = 'static'
         else:
             width = disp.WIDTH_MED
-            print('\n' + disp.center_title(arg + ' ('+ reader.scope + ')', width, '#'))
+            print('\n' + disp.center_title(arg + ' ('+ scope + ')', width, '#'))
+            reader.scope = scope
             reader.read(arg)
             reader = ps_reader.PostScriptReader()

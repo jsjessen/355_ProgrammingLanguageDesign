@@ -107,13 +107,13 @@ class PostScriptDictStack(ps_stack.PostScriptStack):
         Start at the top dictionary on the stack and follow the link
         Assume the link was made to be dynamic/static when created
         """
-        bottom_dic, bottom_link = self.items[0]
+        # Start at the top of the stack
         link_to_me = self.size() - 1
         dic, link_to_parent = self.peek()
         while link_to_me >= 0:
             if key in dic:
                 return dic[key], link_to_me
-            link_to_me = link_to_parent
+            link_to_me = link_to_parent # Follow link to parent dict
             dic, link_to_parent = self.items[link_to_parent]
         return None
 

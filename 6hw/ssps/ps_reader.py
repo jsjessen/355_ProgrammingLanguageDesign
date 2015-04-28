@@ -124,15 +124,15 @@ class PostScriptReader:
             elif self.dictStack.defined(t):
                 definition, link = self.dictStack.lookup(t)
                 if check.isCode(definition):
-                    self.dictStack.push({}, link, self.scope)
+                    self.dictStack.push({}, link, self.scope) # add dictionary
                     self.evaluate(definition) # call function
                     if self.scope == 'static':
-                        self.dictStack.pop()      # return from function
+                        self.dictStack.pop()  # return from function
                 else:
                     self.opStack.push(definition)
             else:
                 try:
-                    # if it is a number push it
+                    # try to push it as a number
                     self.opStack.push(float(t))
                 except:
                     sys.exit("Error: '{}' is not a valid token".format(t))
